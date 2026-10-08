@@ -1,43 +1,46 @@
 import { pool } from "../db/pool";
 import type {
+  Id,
   Project,
   ProjectListRequestParams,
   ProjectCreateBody,
+  ProjectUpdateBody,
 } from "../types/projects";
 
-export const createProject = async (body: ProjectCreateBody) => {
+export const getProject = async (id: Id) => {
   const result = await pool.query<Project>(
     `
-      INSERT INTO projects (
-        title,
-        description,
-        type,
-        sort_order
-      )
-      VALUES ($1, $2, $3, $4)
-      RETURNING
+      SELECT
         id,
         title,
+        subtitle,
         description,
-        type,
+        category,
+        link,
+        media_type AS "mediaType",
+        media_url AS "mediaUrl",
+        thumbnail_url AS "thumbnailUrl",
         sort_order AS "sortOrder",
         created_at AS "createdAt"
+      FROM projects
+      WHERE id = $1
+      LIMIT 1
     `,
-    [body.title, body.description ?? null, body.type, body.sortOrder],
+    [id],
   );
 
   return result.rows[0];
 };
 
 export const getProjects = async (params: ProjectListRequestParams) => {
-  const { page, limit, type } = params;
+  const { page, limit, category } = params;
 
   const values: unknown[] = [];
   const conditions: string[] = [];
 
-  if (type) {
-    values.push(type);
-    conditions.push(`type = $${values.length}`);
+  if (category) {
+    values.push(category);
+    conditions.push(`category = $${values.length}`);
   }
 
   const where =
@@ -54,8 +57,13 @@ export const getProjects = async (params: ProjectListRequestParams) => {
       SELECT
         id,
         title,
-        type,
+        subtitle,
         description,
+        category,
+        link,
+        media_type AS "mediaType",
+        media_url AS "mediaUrl",
+        thumbnail_url AS "thumbnailUrl",
         sort_order AS "sortOrder",
         created_at AS "createdAt"
       FROM projects
@@ -74,9 +82,9 @@ export const getProjectsCount = async (params: ProjectListRequestParams) => {
   const values: unknown[] = [];
   const conditions: string[] = [];
 
-  if (params.type) {
-    values.push(params.type);
-    conditions.push(`type = $${values.length}`);
+  if (params.category) {
+    values.push(params.category);
+    conditions.push(`category = $${values.length}`);
   }
 
   const where =
@@ -92,4 +100,106 @@ export const getProjectsCount = async (params: ProjectListRequestParams) => {
   );
 
   return result.rows[0].total;
+};
+
+export const createProject = async (body: ProjectCreateBody) => {
+  const result = await pool.query<Project>(
+    `
+      INSERT INTO projects (
+        title,
+        subtitle,
+        description,
+        category,
+        link,
+        media_type,
+        media_url,
+        thumbnail_url,
+        sort_order
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING
+        id,
+        title,
+        subtitle,
+        description,
+        category,
+        link,
+        media_type AS "mediaType",
+        media_url AS "mediaUrl",
+        sort_order AS "sortOrder",
+        created_at AS "createdAt"
+    `,
+    [
+      body.title,
+      body.subtitle ?? null,
+      body.description ?? null,
+      body.category ?? null,
+      body.link ?? null,
+      body.mediaType ?? null,
+      body.mediaUrl ?? null,
+      body.thumbnailUrl ?? null,
+      body.sortOrder ?? null,
+    ],
+  );
+
+  return result.rows[0];
+};
+
+export const updateProject = async (id: Id, body: ProjectUpdateBody) => {
+  const fields: string[] = [];
+  const values: unknown[] = [];
+
+  const addField = (column: string, value: unknown) => {
+    fields.push(`${column} = $${values.length + 1}`);
+    values.push(value);
+  };
+
+  if (body.title !== undefined) addField("title", body.title);
+  if (body.subtitle !== undefined) addField("subtitle", body.subtitle);
+  if (body.description !== undefined) addField("description", body.description);
+  if (body.link !== undefined) addField("link", body.link);
+  if (body.mediaType !== undefined) addField("media_type", body.mediaType);
+  if (body.mediaUrl !== undefined) addField("media_url", body.mediaUrl);
+  if (body.thumbnailUrl !== undefined)
+    addField("thumbnail_url", body.thumbnailUrl);
+  if (body.sortOrder !== undefined) addField("sort_order", body.sortOrder);
+
+  if (fields.length === 0) throw new Error("No fields to update");
+
+  values.push(id);
+
+  const result = await pool.query<Project>(
+    `
+      UPDATE projects
+      SET ${fields.join(", ")}
+      WHERE id = $${values.length}
+      RETURNING
+        id,
+        title,
+        subtitle,
+        description,
+        link,
+        media_type AS "mediaType",
+        media_url AS "mediaUrl",
+        thumbnail_url AS "thumbnailUrl",
+        sort_order AS "sortOrder",
+        created_at AS "createdAt"
+    `,
+    values,
+  );
+
+  return result.rows[0];
+};
+
+export const deleteProject = async (id: Id) => {
+  const result = await pool.query<{ id: Id }>(
+    `
+      DELETE FROM projects
+      WHERE id = $1
+      RETURNING id
+    `,
+    [id],
+  );
+
+  return result.rows[0];
 };
