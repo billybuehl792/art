@@ -1,5 +1,8 @@
 import { Router, type Response, type Request } from "express";
+import path from "path";
 import { z } from "zod";
+import { requireAdmin } from "../middleware/auth";
+import { uploadFile } from "../middleware/upload";
 import {
   createProject,
   updateProject,
@@ -10,12 +13,20 @@ import {
 } from "../queries/projects";
 import {
   idSchema,
-  projectCreateBodySchema,
+  projectCreateFormSchema,
+  projectCreateSchema,
   projectListRequestParamsSchema,
   projectListResponseSchema,
-  projectUpdateBodySchema,
+  projectUpdateFormSchema,
+  projectUpdateSchema,
 } from "../schemas/projects";
-import { requireAdmin } from "../middleware/auth";
+import {
+  cleanupFiles,
+  generateThumbnail,
+  mediaUrlToPath,
+} from "../utils/upload";
+import { HttpError } from "../utils/error";
+import { UPLOAD_URL } from "../constants/upload";
 
 const router = Router();
 
@@ -66,52 +77,118 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/", requireAdmin, async (req: Request, res: Response) => {
-  try {
-    const project = await createProject(
-      projectCreateBodySchema.parse(req.body),
-    );
+router.post(
+  "/",
+  requireAdmin,
+  uploadFile.single("file"),
+  async (req: Request, res: Response) => {
+    let thumbnailPath: string | undefined;
 
-    res.status(201).json(project);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res
-        .status(400)
-        .json({ error: "Invalid project", details: error.issues });
+    try {
+      const body = projectCreateFormSchema.parse(req.body);
+      let createData = projectCreateSchema.parse(body);
+
+      if (req.file) {
+        if (!req.file.mimetype.startsWith("image/"))
+          throw new HttpError(400, "Image uploads only for now");
+
+        const thumbnail = await generateThumbnail(req.file);
+
+        thumbnailPath = thumbnail.path;
+        createData.mediaType = "image";
+        createData.mediaUrl = path.join(UPLOAD_URL, req.file.filename);
+        createData.thumbnailUrl = thumbnail.url;
+      }
+
+      const project = await createProject(createData);
+
+      res.status(201).json(project);
+    } catch (error) {
+      await cleanupFiles(req.file?.path, thumbnailPath);
+
+      if (error instanceof HttpError)
+        return res.status(error.status).json({ error: error.message });
+
+      if (error instanceof z.ZodError)
+        return res
+          .status(400)
+          .json({ error: "Invalid project", details: error.issues });
+
+      console.error("Failed to create project:", error);
+
+      res.status(500).json({ error: "Failed to create project" });
     }
+  },
+);
 
-    console.error("Failed to create project:", error);
-    res.status(500).json({ error: "Failed to create project" });
-  }
-});
+router.patch(
+  "/:id",
+  requireAdmin,
+  uploadFile.single("file"),
+  async (req: Request, res: Response) => {
+    let newThumbnailPath: string | undefined;
 
-router.patch("/:id", requireAdmin, async (req: Request, res: Response) => {
-  try {
-    const project = await updateProject(
-      idSchema.parse(req.params.id),
-      projectUpdateBodySchema.parse(req.body),
-    );
+    try {
+      const projectId = idSchema.parse(req.params.id);
+      const body = projectUpdateFormSchema.parse(req.body);
 
-    if (!project) return res.status(404).json({ error: "Project not found" });
+      const existingProject = await getProject(projectId);
+      if (!existingProject) throw new HttpError(404, "Project not found");
 
-    return res.status(200).json(project);
-  } catch (error) {
-    if (error instanceof z.ZodError)
-      return res
-        .status(400)
-        .json({ error: "Invalid project", details: error.issues });
+      let updateData = projectUpdateSchema.parse(body);
 
-    console.error("Failed to update project:", error);
+      if (req.file) {
+        if (!req.file.mimetype.startsWith("image/"))
+          throw new HttpError(400, "Image uploads only for now");
 
-    return res.status(500).json({ error: "Failed to update project" });
-  }
-});
+        const thumbnail = await generateThumbnail(req.file);
+        newThumbnailPath = thumbnail.path;
+        updateData.mediaUrl = path.join(UPLOAD_URL, req.file.filename);
+        updateData.thumbnailUrl = thumbnail.url;
+        updateData.mediaType = "image";
+      }
+
+      const project = await updateProject(projectId, updateData);
+      if (!project) throw new HttpError(404, "Project not found");
+
+      // Remove old media only after the database update succeeds.
+      if (req.file)
+        await cleanupFiles(
+          mediaUrlToPath(existingProject.mediaUrl),
+          mediaUrlToPath(existingProject.thumbnailUrl),
+        );
+
+      return res.status(200).json(project);
+    } catch (error) {
+      await cleanupFiles(req.file?.path, newThumbnailPath);
+
+      if (error instanceof HttpError)
+        return res.status(error.status).json({ error: error.message });
+
+      if (error instanceof z.ZodError)
+        return res
+          .status(400)
+          .json({ error: "Invalid project", details: error.issues });
+
+      console.error("Failed to update project:", error);
+
+      return res.status(500).json({ error: "Failed to update project" });
+    }
+  },
+);
 
 router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
   try {
-    const project = await deleteProject(idSchema.parse(req.params.id));
+    const projectId = idSchema.parse(req.params.id);
 
+    const project = await getProject(projectId);
     if (!project) return res.status(404).json({ error: "Project not found" });
+
+    await deleteProject(projectId);
+    await cleanupFiles(
+      mediaUrlToPath(project.mediaUrl),
+      mediaUrlToPath(project.thumbnailUrl),
+    );
 
     return res.status(204).send();
   } catch (error) {

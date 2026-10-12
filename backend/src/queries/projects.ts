@@ -3,8 +3,8 @@ import type {
   Id,
   Project,
   ProjectListRequestParams,
-  ProjectCreateBody,
-  ProjectUpdateBody,
+  ProjectCreate,
+  ProjectUpdate,
 } from "../types/projects";
 
 export const getProject = async (id: Id) => {
@@ -102,7 +102,7 @@ export const getProjectsCount = async (params: ProjectListRequestParams) => {
   return result.rows[0].total;
 };
 
-export const createProject = async (body: ProjectCreateBody) => {
+export const createProject = async (body: ProjectCreate) => {
   const result = await pool.query<Project>(
     `
       INSERT INTO projects (
@@ -145,7 +145,7 @@ export const createProject = async (body: ProjectCreateBody) => {
   return result.rows[0];
 };
 
-export const updateProject = async (id: Id, body: ProjectUpdateBody) => {
+export const updateProject = async (id: Id, body: ProjectUpdate) => {
   const fields: string[] = [];
   const values: unknown[] = [];
 

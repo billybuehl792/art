@@ -3,8 +3,8 @@ import {
   projectListResponseSchema,
   projectSchema,
   projectListRequestParamsSchema,
-  projectCreateBodySchema,
-  projectUpdateBodySchema,
+  projectCreateSchema,
+  projectUpdateSchema,
   idSchema,
 } from "../schemas/projects";
 
@@ -13,8 +13,8 @@ export type Id = z.infer<typeof idSchema>;
 export type Project = z.infer<typeof projectSchema>;
 
 // CRUD
-export type ProjectCreateBody = z.infer<typeof projectCreateBodySchema>;
-export type ProjectUpdateBody = z.infer<typeof projectUpdateBodySchema>;
+export type ProjectCreate = z.infer<typeof projectCreateSchema>;
+export type ProjectUpdate = z.infer<typeof projectUpdateSchema>;
 
 // Params
 export type ProjectListRequestParams = z.infer<

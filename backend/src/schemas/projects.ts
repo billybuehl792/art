@@ -19,19 +19,35 @@ export const projectSchema = z.object({
   createdAt: z.coerce.date(),
 });
 
-export const projectCreateBodySchema = z.object({
+export const projectCreateFormSchema = z.object({
+  title: z.string().trim().min(1),
+  subtitle: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  category: projectCategoryEnum.nullable().optional(),
+  link: z.url().nullable().optional(),
+  sortOrder: z.coerce.number().int().default(0),
+});
+export const projectCreateSchema = z.object({
   title: z.string().min(1),
   subtitle: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   category: projectCategoryEnum.nullable().optional(),
   link: z.string().nullable().optional(),
+  sortOrder: z.coerce.number().int().default(0),
   mediaType: z.string().nullable().optional(),
   mediaUrl: z.string().nullable().optional(),
   thumbnailUrl: z.string().nullable().optional(),
-  sortOrder: z.number().int().default(0),
 });
 
-export const projectUpdateBodySchema = z.object({
+export const projectUpdateFormSchema = z.object({
+  title: z.string().min(1).optional(),
+  subtitle: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  category: projectCategoryEnum.nullable().optional(),
+  link: z.string().nullable().optional(),
+  sortOrder: z.coerce.number().int().optional(),
+});
+export const projectUpdateSchema = z.object({
   title: z.string().min(1).optional(),
   subtitle: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
@@ -40,7 +56,7 @@ export const projectUpdateBodySchema = z.object({
   mediaType: z.string().nullable().optional(),
   mediaUrl: z.string().nullable().optional(),
   thumbnailUrl: z.string().nullable().optional(),
-  sortOrder: z.number().int().optional(),
+  sortOrder: z.coerce.number().int().optional(),
 });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
