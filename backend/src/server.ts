@@ -3,9 +3,11 @@ import fs from "node:fs/promises";
 import { testDatabaseConnection } from "./db/pool";
 import { UPLOAD_THUMBNAIL_DIR, UPLOAD_DIR } from "./constants/upload";
 
-const port = process.env.PORT || 3000;
-
 const startServer = async () => {
+  const port = process.env.BACKEND_PORT;
+
+  if (!port) throw new Error("BACKEND_PORT is not configured");
+
   if (!process.env.ADMIN_API_KEY)
     throw new Error("ADMIN_API_KEY is not configured");
 
