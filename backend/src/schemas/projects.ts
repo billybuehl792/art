@@ -3,7 +3,7 @@ import { listRequestParamsSchema, listResponseSchema } from "./pagination";
 
 export const idSchema = z.coerce.number().int().positive();
 
-const projectCategoryEnum = z.enum(["art", "dev"]);
+const projectCategoryEnum = z.enum(["", "art", "dev"]);
 
 export const projectSchema = z.object({
   id: idSchema,
@@ -19,39 +19,23 @@ export const projectSchema = z.object({
   createdAt: z.coerce.date(),
 });
 
-export const projectCreateFormSchema = z.object({
-  title: z.string().trim().min(1),
-  subtitle: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  category: projectCategoryEnum.nullable().optional(),
-  link: z.url().nullable().optional(),
-  sortOrder: z.coerce.number().int().default(0),
-});
 export const projectCreateSchema = z.object({
   title: z.string().min(1),
-  subtitle: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  category: projectCategoryEnum.nullable().optional(),
-  link: z.string().nullable().optional(),
+  subtitle: z.string().optional().default(""),
+  description: z.string().optional().default(""),
+  category: projectCategoryEnum.optional().default(""),
+  link: z.string().nullable().optional().default(null),
+  mediaType: z.string().nullable().optional().default(null),
+  mediaUrl: z.string().nullable().optional().default(null),
+  thumbnailUrl: z.string().nullable().optional().default(null),
   sortOrder: z.coerce.number().int().default(0),
-  mediaType: z.string().nullable().optional(),
-  mediaUrl: z.string().nullable().optional(),
-  thumbnailUrl: z.string().nullable().optional(),
 });
 
-export const projectUpdateFormSchema = z.object({
-  title: z.string().min(1).optional(),
-  subtitle: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  category: projectCategoryEnum.nullable().optional(),
-  link: z.string().nullable().optional(),
-  sortOrder: z.coerce.number().int().optional(),
-});
 export const projectUpdateSchema = z.object({
   title: z.string().min(1).optional(),
-  subtitle: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  category: projectCategoryEnum.nullable().optional(),
+  subtitle: z.string().optional(),
+  description: z.string().optional(),
+  category: projectCategoryEnum.optional(),
   link: z.string().nullable().optional(),
   mediaType: z.string().nullable().optional(),
   mediaUrl: z.string().nullable().optional(),

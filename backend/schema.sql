@@ -2,12 +2,13 @@ CREATE TABLE IF NOT EXISTS projects (
     id SERIAL PRIMARY KEY,
 
     title TEXT NOT NULL,
-    subtitle TEXT,
-    description TEXT,
+    subtitle TEXT NOT NULL,
+    description TEXT NOT NULL,
 
-    category TEXT,
+    category TEXT NOT NULL,
 
     link TEXT,
+
     media_type TEXT,
     media_url TEXT,
     thumbnail_url TEXT,

@@ -131,14 +131,14 @@ export const createProject = async (body: ProjectCreate) => {
     `,
     [
       body.title,
-      body.subtitle ?? null,
-      body.description ?? null,
-      body.category ?? null,
-      body.link ?? null,
-      body.mediaType ?? null,
-      body.mediaUrl ?? null,
-      body.thumbnailUrl ?? null,
-      body.sortOrder ?? null,
+      body.subtitle,
+      body.description,
+      body.category,
+      body.link,
+      body.mediaType,
+      body.mediaUrl,
+      body.thumbnailUrl,
+      body.sortOrder,
     ],
   );
 
