@@ -1,4 +1,4 @@
-import { pool } from "../src/db/pool";
+import { pool } from "../src/db";
 
 export default async function setup() {
   try {
