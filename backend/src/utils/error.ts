@@ -19,8 +19,6 @@ export class UnsupportedFileTypeError extends Error {
 }
 
 export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
-  console.error("error:", error);
-
   if (error instanceof UnsupportedFileTypeError)
     return res.status(415).json({ error: error.message });
 

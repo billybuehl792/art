@@ -1,12 +1,14 @@
+import "dotenv/config";
+
 import app from "./app";
 import fs from "node:fs/promises";
-import { testDatabaseConnection } from "./db/pool";
+import { testDatabaseConnection } from "./db";
 import { UPLOAD_THUMBNAIL_DIR, UPLOAD_DIR } from "./constants/upload";
 
 const startServer = async () => {
-  const port = process.env.BACKEND_PORT;
+  const port = process.env.PORT;
 
-  if (!port) throw new Error("BACKEND_PORT is not configured");
+  if (!port) throw new Error("PORT is not configured");
 
   if (!process.env.ADMIN_API_KEY)
     throw new Error("ADMIN_API_KEY is not configured");

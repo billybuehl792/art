@@ -13,8 +13,8 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/projects", projects);
-app.use("/upload", upload);
+app.use("/api/projects", projects);
+app.use("/api/upload", upload);
 
 app.use(errorHandler);
 

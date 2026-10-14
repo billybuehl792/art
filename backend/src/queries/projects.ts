@@ -1,4 +1,4 @@
-import { pool } from "../db/pool";
+import { pool } from "../db";
 import type {
   Id,
   Project,
