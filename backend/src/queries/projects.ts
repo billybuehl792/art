@@ -192,14 +192,6 @@ export const updateProject = async (id: Id, body: ProjectUpdate) => {
 };
 
 export const deleteProject = async (id: Id) => {
-  const result = await pool.query<{ id: Id }>(
-    `
-      DELETE FROM projects
-      WHERE id = $1
-      RETURNING id
-    `,
-    [id],
-  );
-
-  return result.rows[0];
+  const result = await pool.query("DELETE FROM projects WHERE id = $1", [id]);
+  return !!result.rowCount && result.rowCount > 0;
 };

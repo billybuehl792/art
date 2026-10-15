@@ -31,17 +31,21 @@ export const projectCreateSchema = z.object({
   sortOrder: z.coerce.number().int().default(0),
 });
 
-export const projectUpdateSchema = z.object({
-  title: z.string().min(1).optional(),
-  subtitle: z.string().optional(),
-  description: z.string().optional(),
-  category: projectCategoryEnum.optional(),
-  link: z.string().nullable().optional(),
-  mediaType: z.string().nullable().optional(),
-  mediaUrl: z.string().nullable().optional(),
-  thumbnailUrl: z.string().nullable().optional(),
-  sortOrder: z.coerce.number().int().optional(),
-});
+export const projectUpdateSchema = z
+  .object({
+    title: z.string().min(1).optional(),
+    subtitle: z.string().optional(),
+    description: z.string().optional(),
+    category: projectCategoryEnum.optional(),
+    link: z.string().nullable().optional(),
+    mediaType: z.string().nullable().optional(),
+    mediaUrl: z.string().nullable().optional(),
+    thumbnailUrl: z.string().nullable().optional(),
+    sortOrder: z.coerce.number().int().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
   category: projectCategoryEnum.optional(),

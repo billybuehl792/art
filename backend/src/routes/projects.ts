@@ -61,8 +61,10 @@ router.patch("/:id", requireAdmin, async (req: Request, res: Response) => {
 });
 
 router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
-  const projectId = idSchema.parse(req.params.id);
-  await deleteProject(projectId);
+  const id = idSchema.parse(req.params.id);
+  const deleted = await deleteProject(id);
+
+  if (!deleted) throw new HttpError(404, "Project not found");
 
   return res.status(204).send();
 });
