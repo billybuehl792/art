@@ -8,8 +8,12 @@ import {
   UPLOAD_THUMBNAIL_URL,
 } from "../constants/upload";
 
+export const getThumbnailFilename = (filename: string) => {
+  return `thumbnail-${filename}`;
+};
+
 export const generateThumbnail = async (file: Express.Multer.File) => {
-  const thumbnailFilename = `thumbnail-${file.filename}`;
+  const thumbnailFilename = getThumbnailFilename(file.filename);
   const thumbnailPath = path.join(UPLOAD_THUMBNAIL_DIR, thumbnailFilename);
   const thumbnailUrl = path.join(UPLOAD_THUMBNAIL_URL, thumbnailFilename);
 
@@ -39,20 +43,4 @@ export const cleanupFiles = async (...filePaths: (string | undefined)[]) => {
         }
       }),
   );
-};
-
-export const mediaUrlToPath = (url: string | null | undefined) => {
-  if (!url) return undefined;
-
-  // Only accept URLs belonging to our uploads directory.
-  if (!url.startsWith(UPLOAD_URL)) throw new Error(`Invalid media URL: ${url}`);
-
-  const fileName = path.basename(url);
-  const filePath = path.resolve(UPLOAD_DIR, fileName);
-
-  // Prevent path traversal outside UPLOAD_DIR.
-  if (!filePath.startsWith(`${path.resolve(UPLOAD_DIR)}${path.sep}`))
-    throw new Error(`Invalid media path: ${url}`);
-
-  return filePath;
 };
