@@ -9,12 +9,11 @@ import "@fontsource/raleway/900.css";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./theme";
-
-const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -22,14 +21,21 @@ declare module "@tanstack/react-router" {
   }
 }
 
+const router = createRouter({ routeTree });
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+});
+
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
       <ThemeProvider theme={createAppTheme()}>
-        <CssBaseline />
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </QueryClientProvider>
       </ThemeProvider>
     </StrictMode>,
   );

@@ -11,6 +11,7 @@ declare module "@mui/material/styles" {
       appBarHeight: number;
       navPanelWidth: number;
       footerHeight: number;
+      pageHeaderHeight: number;
     };
   }
   interface ThemeOptions {
@@ -18,6 +19,7 @@ declare module "@mui/material/styles" {
       appBarHeight: number;
       navPanelWidth?: number;
       footerHeight?: number;
+      pageHeaderHeight?: number;
     };
   }
 }
@@ -26,7 +28,12 @@ export const createAppTheme = (mode: PaletteMode = "dark") => {
   const isLight = mode === "light";
 
   return createTheme({
-    layout: { appBarHeight: 60, navPanelWidth: 200, footerHeight: 32 },
+    layout: {
+      appBarHeight: 60,
+      navPanelWidth: 200,
+      footerHeight: 32,
+      pageHeaderHeight: 60,
+    },
     palette: {
       mode,
       primary: {
@@ -82,6 +89,7 @@ export const createAppTheme = (mode: PaletteMode = "dark") => {
             },
           }),
         },
+        defaultProps: { underline: "none" },
       },
       MuiListItemButton: {
         styleOverrides: {

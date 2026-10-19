@@ -10,6 +10,7 @@ import {
   Brush as BrushIcon,
   Code as CodeIcon,
   ContactPage as ContactPageIcon,
+  AdminPanelSettings as AdminIcon,
 } from "@mui/icons-material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
 
@@ -48,6 +49,11 @@ const NavList: React.FC<NavListProps> = ({ onNavigate, ...props }) => {
       <ListItemButtonLink to="/contact" {...buttonProps}>
         <ListItemIcon children={<ContactPageIcon />} />
         <ListItemText primary="contact" />
+      </ListItemButtonLink>
+
+      <ListItemButtonLink to="/admin" {...buttonProps}>
+        <ListItemIcon children={<AdminIcon />} />
+        <ListItemText primary="admin" />
       </ListItemButtonLink>
     </List>
   );

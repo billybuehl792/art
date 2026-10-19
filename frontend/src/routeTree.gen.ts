@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppArtRouteImport } from './routes/_app.art'
 import { Route as AppContactRouteImport } from './routes/_app.contact'
 import { Route as AppDevRouteImport } from './routes/_app.dev'
@@ -22,6 +23,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
 const AppArtRoute = AppArtRouteImport.update({
@@ -42,11 +48,13 @@ const AppDevRoute = AppDevRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/admin': typeof AppAdminRoute
   '/art': typeof AppArtRoute
   '/contact': typeof AppContactRoute
   '/dev': typeof AppDevRoute
 }
 export interface FileRoutesByTo {
+  '/admin': typeof AppAdminRoute
   '/art': typeof AppArtRoute
   '/contact': typeof AppContactRoute
   '/dev': typeof AppDevRoute
@@ -55,6 +63,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/_app/admin': typeof AppAdminRoute
   '/_app/art': typeof AppArtRoute
   '/_app/contact': typeof AppContactRoute
   '/_app/dev': typeof AppDevRoute
@@ -62,12 +71,13 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/art' | '/contact' | '/dev'
+  fullPaths: '/' | '/admin' | '/art' | '/contact' | '/dev'
   fileRoutesByTo: FileRoutesByTo
-  to: '/art' | '/contact' | '/dev' | '/'
+  to: '/admin' | '/art' | '/contact' | '/dev' | '/'
   id:
     | '__root__'
     | '/_app'
+    | '/_app/admin'
     | '/_app/art'
     | '/_app/contact'
     | '/_app/dev'
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/art': {
@@ -119,6 +136,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppArtRoute: typeof AppArtRoute
   AppContactRoute: typeof AppContactRoute
   AppDevRoute: typeof AppDevRoute
@@ -126,6 +144,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppArtRoute: AppArtRoute,
   AppContactRoute: AppContactRoute,
   AppDevRoute: AppDevRoute,

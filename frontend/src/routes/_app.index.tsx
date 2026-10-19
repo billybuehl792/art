@@ -21,13 +21,13 @@ function RouteComponent() {
     <Container
       sx={(theme) => ({
         position: "relative",
-        height: `calc(100vh - ${theme.layout.footerHeight}px - ${isLg ? 0 : theme.layout.appBarHeight}px)`,
+        minHeight: `calc(100vh - ${theme.layout.footerHeight}px - ${isLg ? 0 : theme.layout.appBarHeight}px)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       })}
     >
-      <Stack spacing={1}>
+      <Stack spacing={1} sx={{ p: 2 }}>
         <Stack direction="row" sx={{ justifyContent: "center" }}>
           <ProfileImage />
         </Stack>

@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Container } from "@mui/material";
+import PageHeader from "@/components/layout/PageHeader";
 
 export const Route = createFileRoute("/_app/art")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <Container>art</Container>;
+  return (
+    <Container>
+      <PageHeader title="Art" />
+    </Container>
+  );
 }

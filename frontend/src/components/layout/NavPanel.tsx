@@ -1,19 +1,18 @@
 import React from "react";
 import { styled, ThemeProvider, useTheme } from "@mui/material/styles";
-import { Link as TanstackLink } from "@tanstack/react-router";
 import {
   Divider,
   Drawer,
   type DrawerProps,
-  Link,
   Stack,
   Toolbar,
-  Typography,
 } from "@mui/material";
 import NavList from "../lists/NavList";
 import SocialList from "../lists/SocialList";
 import { darkTheme, lightTheme } from "../../theme";
 import { APP_TITLE } from "../../constants";
+import Link from "../links/Link";
+import { truncateText } from "@/utils/sx";
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   position: "fixed",
@@ -39,14 +38,14 @@ const NavPanel: React.FC<DrawerProps> = (props) => {
     <ThemeProvider theme={isLightMode ? darkTheme : lightTheme}>
       <StyledDrawer component="nav" variant="permanent" {...props}>
         <Toolbar>
-          <Link component={TanstackLink} to="/" underline="none">
-            <Typography variant="h1">{APP_TITLE}</Typography>
+          <Link variant="h1" to="/" sx={truncateText}>
+            {APP_TITLE}
           </Link>
         </Toolbar>
 
         <Divider />
 
-        <Stack sx={{ flexGrow: 1 }}>
+        <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
           <NavList />
         </Stack>
 

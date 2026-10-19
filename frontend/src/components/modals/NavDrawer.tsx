@@ -39,9 +39,9 @@ const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
 
       <Divider />
 
-      <Stack spacing={1} divider={<Divider />}>
-        <NavList onNavigate={handleOnClose} />
-        <Stack sx={{ display: "flex", alignItems: "center" }}>
+      <Stack divider={<Divider />} sx={{ overflow: "auto" }}>
+        <NavList disablePadding onNavigate={handleOnClose} />
+        <Stack sx={{ display: "flex", alignItems: "center", p: 1 }}>
           <SocialList />
         </Stack>
       </Stack>
