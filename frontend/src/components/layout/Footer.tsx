@@ -6,13 +6,19 @@ import { darkTheme, lightTheme } from "../../theme";
 import { truncateText } from "../../utils/sx";
 
 const StyledBox = styled(Box)(({ theme }) => ({
+  position: "fixed",
   display: "flex",
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: theme.layout.footerHeight,
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: theme.palette.background.paper,
   borderTop: `1px solid ${theme.palette.divider}`,
   color: theme.palette.text.primary,
   zIndex: theme.zIndex.appBar,
+  [theme.breakpoints.up("sm")]: { left: theme.layout.navPanelWidth },
 }));
 
 const Footer: React.FC<BoxProps> = (props) => {

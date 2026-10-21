@@ -16,9 +16,7 @@ import { APP_TITLE } from "../../constants";
 import { truncateText } from "../../utils/sx";
 
 const StyledDrawer = styled(Drawer)({
-  "& .MuiDrawer-paper": {
-    height: "calc(100vh - 60px)",
-  },
+  "& .MuiDrawer-paper": { height: "calc(100vh - 60px)" },
 });
 
 const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
@@ -39,9 +37,23 @@ const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
 
       <Divider />
 
-      <Stack divider={<Divider />} sx={{ overflow: "auto" }}>
-        <NavList disablePadding onNavigate={handleOnClose} />
-        <Stack sx={{ display: "flex", alignItems: "center", p: 1 }}>
+      <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
+        <NavList
+          disablePadding
+          onNavigate={handleOnClose}
+          sx={{ flexGrow: 1 }}
+        />
+        <Stack
+          sx={(theme) => ({
+            position: "sticky",
+            bottom: 0,
+            display: "flex",
+            alignItems: "center",
+            p: 1,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            bgcolor: theme.palette.background.paper,
+          })}
+        >
           <SocialList />
         </Stack>
       </Stack>

@@ -17,13 +17,14 @@ interface PageHeaderProps extends Omit<StackProps, "title"> {
 
 const StyledStack = styled(Stack)(({ theme }) => ({
   position: "sticky",
-  top: 0,
+  top: theme.layout.appBarHeight,
   display: "flex",
   alignItems: "center",
   height: theme.layout.pageHeaderHeight,
   backgroundColor: theme.palette.background.paper,
   borderBottom: `1px solid ${theme.palette.divider}`,
-  zIndex: theme.zIndex.appBar,
+  zIndex: theme.zIndex.appBar - 1,
+  [theme.breakpoints.up("sm")]: { top: 0 },
 }));
 
 const PageHeader: React.FC<PageHeaderProps> = ({

@@ -9,9 +9,13 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "vitest"
+    "test": "vitest",
+    "seed:uploads": "tsx --env-file=.env scripts/seedUploads.ts",
+    "seed:projects": "tsx --env-file=.env scripts/seedProjects.ts",
+    "seed:clear": "tsx --env-file=.env scripts/clearSeedData.ts"
   },
   "dependencies": {
+    "axios": "^1.20.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.8",
     "express": "^5.2.1",

@@ -1,7 +1,6 @@
 import { z } from "zod";
+import { idSchema } from "./basic";
 import { listRequestParamsSchema, listResponseSchema } from "./pagination";
-
-export const idSchema = z.coerce.number().int().positive();
 
 const projectCategoryEnum = z.enum(["", "art", "dev"]);
 

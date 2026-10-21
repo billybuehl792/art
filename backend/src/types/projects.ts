@@ -1,11 +1,11 @@
 import { z } from "zod";
+import { idSchema } from "../schemas/basic";
 import {
   projectListResponseSchema,
   projectSchema,
   projectListRequestParamsSchema,
   projectCreateSchema,
   projectUpdateSchema,
-  idSchema,
 } from "../schemas/projects";
 
 export type Id = z.infer<typeof idSchema>;

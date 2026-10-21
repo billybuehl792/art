@@ -8,8 +8,8 @@ import {
   deleteProject,
   getProject,
 } from "../queries/projects";
+import { idSchema } from "../schemas/basic";
 import {
-  idSchema,
   projectCreateSchema,
   projectListRequestParamsSchema,
   projectListResponseSchema,
