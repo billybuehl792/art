@@ -5,6 +5,7 @@ import { requireAdmin } from "../middleware/auth";
 import { uploadFile } from "../middleware/upload";
 import { generateThumbnail, getThumbnailFilename } from "../utils/upload";
 import { HttpError } from "../utils/error";
+import { uploadResponseSchema } from "../schemas/upload";
 import {
   UPLOAD_DIR,
   UPLOAD_THUMBNAIL_DIR,
@@ -22,11 +23,13 @@ router.post(
 
     const thumbnail = await generateThumbnail(req.file);
 
-    return res.status(200).json({
-      mediaType: "image",
+    const response = uploadResponseSchema.parse({
+      mediaType: req.file.mimetype,
       mediaUrl: path.join(UPLOAD_URL, req.file.filename),
       thumbnailUrl: thumbnail.url,
     });
+
+    return res.status(200).json(response);
   },
 );
 

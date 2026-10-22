@@ -7,25 +7,26 @@ import type {
   ProjectUpdate,
 } from "../types/projects";
 
+const PROJECT = `
+id,
+title,
+subtitle,
+description,
+category,
+link,
+media_type AS "mediaType",
+media_url AS "mediaUrl",
+thumbnail_url AS "thumbnailUrl",
+priority,
+sort_order AS "sortOrder",
+created_at AS "createdAt",
+updated_at AS "updatedAt"
+`;
+const SELECT_PROJECT = `SELECT ${PROJECT} FROM PROJECTS`;
+
 export const getProject = async (id: Id) => {
   const result = await pool.query<Project>(
-    `
-      SELECT
-        id,
-        title,
-        subtitle,
-        description,
-        category,
-        link,
-        media_type AS "mediaType",
-        media_url AS "mediaUrl",
-        thumbnail_url AS "thumbnailUrl",
-        sort_order AS "sortOrder",
-        created_at AS "createdAt"
-      FROM projects
-      WHERE id = $1
-      LIMIT 1
-    `,
+    `${SELECT_PROJECT} WHERE id = $1 LIMIT 1`,
     [id],
   );
 
@@ -33,45 +34,25 @@ export const getProject = async (id: Id) => {
 };
 
 export const getProjects = async (params: ProjectListRequestParams) => {
-  const { page, limit, category } = params;
-
   const values: unknown[] = [];
   const conditions: string[] = [];
 
-  if (category) {
-    values.push(category);
+  if (params.category) {
+    values.push(params.category);
     conditions.push(`category = $${values.length}`);
   }
 
   const where =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const orderBy = "ORDER BY sort_order ASC, created_at DESC";
+  const limit = `LIMIT $${values.length + 1}`;
+  const offset = `OFFSET $${values.length + 2}`;
 
-  const limitParam = values.length + 1;
-  const offsetParam = values.length + 2;
-
-  values.push(limit);
-  values.push((page - 1) * limit);
+  values.push(params.limit);
+  values.push((params.page - 1) * params.limit);
 
   const result = await pool.query<Project>(
-    `
-      SELECT
-        id,
-        title,
-        subtitle,
-        description,
-        category,
-        link,
-        media_type AS "mediaType",
-        media_url AS "mediaUrl",
-        thumbnail_url AS "thumbnailUrl",
-        sort_order AS "sortOrder",
-        created_at AS "createdAt"
-      FROM projects
-      ${where}
-      ORDER BY sort_order ASC, created_at DESC
-      LIMIT $${limitParam}
-      OFFSET $${offsetParam}
-    `,
+    `${SELECT_PROJECT} ${where} ${orderBy} ${limit} ${offset}`,
     values,
   );
 
@@ -114,20 +95,11 @@ export const createProject = async (body: ProjectCreate) => {
         media_type,
         media_url,
         thumbnail_url,
+        priority,
         sort_order
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING
-        id,
-        title,
-        subtitle,
-        description,
-        category,
-        link,
-        media_type AS "mediaType",
-        media_url AS "mediaUrl",
-        sort_order AS "sortOrder",
-        created_at AS "createdAt"
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING ${PROJECT}
     `,
     [
       body.title,
@@ -138,6 +110,7 @@ export const createProject = async (body: ProjectCreate) => {
       body.mediaType,
       body.mediaUrl,
       body.thumbnailUrl,
+      body.priority,
       body.sortOrder,
     ],
   );
@@ -162,29 +135,17 @@ export const updateProject = async (id: Id, body: ProjectUpdate) => {
   if (body.mediaUrl !== undefined) addField("media_url", body.mediaUrl);
   if (body.thumbnailUrl !== undefined)
     addField("thumbnail_url", body.thumbnailUrl);
+  if (body.priority !== undefined) addField("priority", body.priority);
   if (body.sortOrder !== undefined) addField("sort_order", body.sortOrder);
 
   if (fields.length === 0) throw new Error("No fields to update");
 
   values.push(id);
 
+  const where = `WHERE id = $${values.length}`;
+
   const result = await pool.query<Project>(
-    `
-      UPDATE projects
-      SET ${fields.join(", ")}
-      WHERE id = $${values.length}
-      RETURNING
-        id,
-        title,
-        subtitle,
-        description,
-        link,
-        media_type AS "mediaType",
-        media_url AS "mediaUrl",
-        thumbnail_url AS "thumbnailUrl",
-        sort_order AS "sortOrder",
-        created_at AS "createdAt"
-    `,
+    `UPDATE projects SET ${fields.join(", ")} ${where} RETURNING ${PROJECT}`,
     values,
   );
 
