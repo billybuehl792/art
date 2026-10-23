@@ -1,6 +1,7 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 import { apiEndpoints } from "@/endpoints";
 import type { Project, ProjectListRequestParams } from "@/types/projects";
+import { projectListRequestParamsSchema } from "@/schemas/projects";
 
 export const apiQueries = {
   health: {
@@ -9,9 +10,20 @@ export const apiQueries = {
   },
   projects: {
     get: (params?: ProjectListRequestParams) =>
-      queryOptions({
+      infiniteQueryOptions({
         queryKey: ["projects"],
-        queryFn: () => apiEndpoints.projects.get(params),
+        initialPageParam: 1,
+        queryFn: ({ pageParam: page }) =>
+          apiEndpoints.projects.get(
+            projectListRequestParamsSchema.parse({ page, ...params }),
+          ),
+        getNextPageParam: (lastPage) => {
+          const nextPage = lastPage.data.page + 1;
+          return nextPage <=
+            Math.ceil(lastPage.data.total / lastPage.data.limit)
+            ? nextPage
+            : undefined;
+        },
       }),
     project: (id: Project["id"]) => ({
       get: () =>

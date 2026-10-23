@@ -17,8 +17,10 @@ export const getMockProject = (body?: Partial<Project>): Project => {
     mediaType: null,
     mediaUrl: null,
     thumbnailUrl: null,
+    priority: 1,
     sortOrder: 0,
     createdAt: new Date(),
+    updatedAt: new Date(),
     ...body,
   };
 };

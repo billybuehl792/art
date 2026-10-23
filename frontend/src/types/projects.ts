@@ -5,10 +5,7 @@ import {
   projectListRequestParamsSchema,
   projectCreateSchema,
   projectUpdateSchema,
-  idSchema,
 } from "../schemas/projects";
-
-export type Id = z.infer<typeof idSchema>;
 
 export type Project = z.infer<typeof projectSchema>;
 
