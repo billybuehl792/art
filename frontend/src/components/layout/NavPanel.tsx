@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, ThemeProvider, useTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import {
   Divider,
   Drawer,
@@ -9,9 +9,8 @@ import {
 } from "@mui/material";
 import NavList from "../lists/NavList";
 import SocialList from "../lists/SocialList";
-import { darkTheme, lightTheme } from "../../theme";
-import { APP_TITLE } from "../../constants";
 import Link from "../links/Link";
+import { APP_TITLE } from "../../constants";
 import { truncateText } from "@/utils/sx";
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
@@ -23,37 +22,26 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   display: "flex",
   flexShrink: 0,
   zIndex: theme.zIndex.appBar,
-  "& .MuiDrawer-paper": {
-    width: theme.layout.navPanelWidth,
-  },
+  "& .MuiDrawer-paper": { width: theme.layout.navPanelWidth },
 }));
 
 const NavPanel: React.FC<DrawerProps> = (props) => {
-  /** Values */
-
-  const theme = useTheme();
-  const isLightMode = theme.palette.mode === "light";
-
   return (
-    <ThemeProvider theme={isLightMode ? darkTheme : lightTheme}>
-      <StyledDrawer component="nav" variant="permanent" {...props}>
-        <Toolbar>
-          <Link variant="h1" to="/" sx={truncateText}>
-            {APP_TITLE}
-          </Link>
-        </Toolbar>
+    <StyledDrawer component="nav" variant="permanent" {...props}>
+      <Toolbar>
+        <Link variant="h1" to="/" sx={truncateText}>
+          {APP_TITLE}
+        </Link>
+      </Toolbar>
 
-        <Divider />
+      <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
+        <NavList />
+      </Stack>
 
-        <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
-          <NavList />
-        </Stack>
+      <Divider />
 
-        <Divider />
-
-        <SocialList sx={{ p: 2 }} />
-      </StyledDrawer>
-    </ThemeProvider>
+      <SocialList sx={{ p: 2 }} />
+    </StyledDrawer>
   );
 };
 

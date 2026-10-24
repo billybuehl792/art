@@ -31,7 +31,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <ThemeProvider theme={createAppTheme()}>
+      <ThemeProvider theme={createAppTheme} defaultMode="dark">
         <QueryClientProvider client={queryClient}>
           <CssBaseline />
           <RouterProvider router={router} />

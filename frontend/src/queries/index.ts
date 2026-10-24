@@ -13,6 +13,7 @@ export const apiQueries = {
       infiniteQueryOptions({
         queryKey: ["projects"],
         initialPageParam: 1,
+        staleTime: Infinity,
         queryFn: ({ pageParam: page }) =>
           apiEndpoints.projects.get(
             projectListRequestParamsSchema.parse({ page, ...params }),

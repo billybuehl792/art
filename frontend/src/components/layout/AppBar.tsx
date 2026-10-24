@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import {
   AppBar as MuiAppBar,
   Toolbar,
-  useTheme,
-  ThemeProvider,
   IconButton,
   Stack,
   type AppBarProps,
@@ -14,7 +12,6 @@ import {
 } from "@mui/icons-material";
 import NavDrawer from "../modals/NavDrawer";
 import Link from "../links/Link";
-import { darkTheme, lightTheme } from "../../theme";
 import { APP_TITLE } from "../../constants";
 import { truncateText } from "@/utils/sx";
 
@@ -22,15 +19,13 @@ const AppBar: React.FC<AppBarProps> = (props) => {
   /** Values */
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const theme = useTheme();
-  const isLightMode = theme.palette.mode === "light";
 
   /** Callbacks */
 
   const handleToggleMenuOpen = () => setMenuOpen((open) => !open);
 
   return (
-    <ThemeProvider theme={isLightMode ? darkTheme : lightTheme}>
+    <>
       <MuiAppBar position="fixed" color="default" {...props}>
         <Toolbar>
           <Stack direction="row" sx={{ minWidth: 0, flexGrow: 1 }}>
@@ -46,7 +41,7 @@ const AppBar: React.FC<AppBarProps> = (props) => {
       </MuiAppBar>
 
       <NavDrawer open={menuOpen} onClose={handleToggleMenuOpen} />
-    </ThemeProvider>
+    </>
   );
 };
 
