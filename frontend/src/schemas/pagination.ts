@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { DEFAULT_LIMIT } from "@/constants";
 
 export const listRequestParamsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(1).max(100).default(DEFAULT_LIMIT),
 });
 
 export function listResponseSchema<T extends z.ZodType>(itemSchema: T) {

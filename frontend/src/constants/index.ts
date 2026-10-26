@@ -6,3 +6,4 @@ export const LINKEDIN_URL = "https://www.linkedin.com/in/billybuehl/";
 export const ARTSTATION_URL = "https://www.artstation.com/bbuehl792";
 
 export const NULL_ID = 0;
+export const DEFAULT_LIMIT = 20;

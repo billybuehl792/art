@@ -4,16 +4,14 @@ import {
   Box,
   Dialog,
   DialogContent,
-  IconButton,
   Skeleton,
-  Stack,
-  Typography,
   type DialogProps,
 } from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
+import DialogHeader from "../layout/DialogHeader";
+import ProjectOptionsIconButton from "../buttons/ProjectOptionsIconButton";
 import { apiQueries } from "@/queries";
 import { NULL_ID } from "@/constants";
-import { sxArray, truncateText } from "@/utils/sx";
+import { sxArray } from "@/utils/sx";
 import type { Project } from "@/types/projects";
 
 interface ProjectDialogProps extends DialogProps {
@@ -66,31 +64,15 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
       onTransitionExited={handleOnClosed}
       {...props}
     >
-      <Stack
-        direction="row"
-        sx={(theme) => ({
-          justifyContent: "space-between",
-          alignItems: "center",
-          p: theme.spacing(2),
-          borderBottom: `1px solid ${theme.palette.divider}`,
+      <DialogHeader
+        title={project?.title}
+        subtitle={project?.subtitle}
+        loading={projectQuery.isLoading}
+        onClose={handleOnClose}
+        {...(!!project && {
+          endContent: <ProjectOptionsIconButton project={project} />,
         })}
-      >
-        {projectQuery.isLoading ? (
-          <Skeleton variant="text" sx={{ width: 200, maxWidth: "100%" }} />
-        ) : (
-          <Stack spacing={0.5} sx={{ flexGrow: 1, overflow: "hidden" }}>
-            <Typography variant="h2" sx={truncateText}>
-              {project?.title}
-            </Typography>
-            <Typography variant="subtitle2" sx={truncateText}>
-              {project?.subtitle}
-            </Typography>
-          </Stack>
-        )}
-        <IconButton aria-label="close" onClick={handleOnClose}>
-          <CloseIcon />
-        </IconButton>
-      </Stack>
+      />
       <DialogContent>
         <Box
           sx={sxArray({
@@ -105,10 +87,10 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
               variant="rounded"
               sx={{ position: "absolute", width: "100%", height: "100%" }}
             />
-          ) : (
+          ) : project?.mediaUrl ? (
             <Box
               component="img"
-              src={project?.mediaUrl ?? ""}
+              src={project.mediaUrl}
               loading="lazy"
               sx={{
                 display: "block",
@@ -119,7 +101,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
                 objectFit: "contain",
               }}
             />
-          )}
+          ) : null}
         </Box>
       </DialogContent>
     </Dialog>

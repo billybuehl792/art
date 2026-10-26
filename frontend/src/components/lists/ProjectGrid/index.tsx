@@ -4,6 +4,7 @@ import ProjectGridItem, { type ProjectGridItemProps } from "./ProjectGridItem";
 import ProjectGridSkeletonItem from "./ProjectGridSkeletonItem";
 import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
 import { sxArray } from "@/utils/sx";
+import { DEFAULT_LIMIT } from "@/constants";
 import type { Project, ProjectListRequestParams } from "@/types/projects";
 
 export interface ProjectGridProps extends Omit<ImageListProps, "children"> {
@@ -33,11 +34,12 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
   /** Values */
 
   const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-  const skeletonCount = (params?.limit ?? 20) - 1;
+  const isMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const skeletonCount = (params?.limit ?? DEFAULT_LIMIT) - 1;
 
   return (
     <ImageList
-      cols={isSm ? 1 : 3}
+      cols={isSm ? 1 : isMd ? 2 : 3}
       gap={1}
       {...props}
       sx={sxArray({ overflow: "visible" }, props?.sx)}
