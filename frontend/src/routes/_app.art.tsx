@@ -53,11 +53,14 @@ function RouteComponent() {
       <PageHeader title="Art" sx={{ px: isSm ? 1 : 0 }} />
       <ProjectGrid
         projects={projects}
-        isFetchingNextPage={projectListQuery.isFetchingNextPage}
         loading={projectListQuery.isLoading}
+        error={projectListQuery.error}
         hasNextPage={projectListQuery.hasNextPage}
-        onFetchNextPage={projectListQuery.fetchNextPage}
+        isFetchingNextPage={projectListQuery.isFetchingNextPage}
+        isRefetching={projectListQuery.isRefetching}
         onProjectClick={handleProjectOnClick}
+        onFetchNextPage={projectListQuery.fetchNextPage}
+        onRetry={projectListQuery.refetch}
       />
       <ProjectDialog
         open={!!selectedProject}

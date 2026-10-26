@@ -110,6 +110,7 @@ export const createAppTheme = createTheme({
         }),
       },
     },
+    MuiImageList: { styleOverrides: { root: () => ({ margin: 0 }) } },
     MuiImageListItemBar: {
       styleOverrides: {
         titleWrap: ({ theme }) => ({ color: theme.palette.text.primary }),

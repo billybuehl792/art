@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import DialogHeader from "../layout/DialogHeader";
 import ProjectOptionsIconButton from "../buttons/ProjectOptionsIconButton";
+import StatusCard from "../cards/StatusCard";
 import { apiQueries } from "@/queries";
 import { NULL_ID } from "@/constants";
 import { sxArray } from "@/utils/sx";
@@ -86,6 +87,12 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
             <Skeleton
               variant="rounded"
               sx={{ position: "absolute", width: "100%", height: "100%" }}
+            />
+          ) : projectQuery.isError ? (
+            <StatusCard
+              status="error"
+              message={projectQuery.error.message}
+              sx={{ flexGrow: 1 }}
             />
           ) : project?.mediaUrl ? (
             <Box
