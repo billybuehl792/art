@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Box,
-  Container,
   Dialog,
+  DialogContent,
   IconButton,
   Skeleton,
-  Toolbar,
+  Stack,
   Typography,
   type DialogProps,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { apiQueries } from "@/queries";
-import { truncateText } from "@/utils/sx";
 import { NULL_ID } from "@/constants";
+import { sxArray, truncateText } from "@/utils/sx";
 import type { Project } from "@/types/projects";
 
 interface ProjectDialogProps extends DialogProps {
@@ -59,51 +59,52 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
   return (
     <Dialog
       open={open}
-      fullScreen
+      maxWidth="lg"
+      fullWidth
       closeAfterTransition
       onClose={handleOnClose}
       onTransitionExited={handleOnClosed}
       {...props}
     >
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography variant="h2" sx={truncateText}>
-          {projectQuery.isLoading ? (
-            <Skeleton variant="text" sx={{ width: 200, maxWidth: "100%" }} />
-          ) : (
-            project?.title
-          )}
-        </Typography>
-        <IconButton color="primary" onClick={handleOnClose}>
-          <CloseIcon />
-        </IconButton>
-      </Toolbar>
-
-      <Container
-        disableGutters
+      <Stack
+        direction="row"
         sx={(theme) => ({
-          position: "absolute",
-          display: "flex",
-          top: `${theme.layout.appBarHeight}px`,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          flexDirection: "column",
-          overflow: "auto",
+          justifyContent: "space-between",
+          alignItems: "center",
+          p: theme.spacing(2),
+          borderBottom: `1px solid ${theme.palette.divider}`,
         })}
       >
+        {projectQuery.isLoading ? (
+          <Skeleton variant="text" sx={{ width: 200, maxWidth: "100%" }} />
+        ) : (
+          <Stack spacing={0.5} sx={{ flexGrow: 1, overflow: "hidden" }}>
+            <Typography variant="h2" sx={truncateText}>
+              {project?.title}
+            </Typography>
+            <Typography variant="subtitle2" sx={truncateText}>
+              {project?.subtitle}
+            </Typography>
+          </Stack>
+        )}
+        <IconButton aria-label="close" onClick={handleOnClose}>
+          <CloseIcon />
+        </IconButton>
+      </Stack>
+      <DialogContent>
         <Box
-          sx={{
-            flex: 1,
-            minWidth: "100%",
-            minHeight: "100%",
+          sx={sxArray({
+            position: "relative",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            p: 2,
-          }}
+            minHeight: 300,
+          })}
         >
           {projectQuery.isLoading ? (
-            <Skeleton sx={{ width: "100%", height: "100%" }} />
+            <Skeleton
+              variant="rounded"
+              sx={{ position: "absolute", width: "100%", height: "100%" }}
+            />
           ) : (
             <Box
               component="img"
@@ -120,7 +121,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
             />
           )}
         </Box>
-      </Container>
+      </DialogContent>
     </Dialog>
   );
 };

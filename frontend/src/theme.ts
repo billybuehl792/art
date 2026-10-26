@@ -57,8 +57,8 @@ export const createAppTheme = createTheme({
   },
   typography: {
     fontFamily: "Raleway, sans-serif",
-    subtitle1: { fontWeight: 800, fontSize: "1.5rem", lineHeight: 1.4 },
-    subtitle2: { fontWeight: 600, fontSize: "1rem" },
+    subtitle1: { fontWeight: 600, fontSize: "1.5rem", lineHeight: 1.4 },
+    subtitle2: { fontWeight: 500, fontSize: "0.8rem" },
     caption: { fontWeight: 400, fontSize: "0.75rem" },
     h1: { fontWeight: 700, fontSize: "1.5rem" },
     h2: { fontWeight: 600, fontSize: "1.25rem" },
@@ -74,6 +74,13 @@ export const createAppTheme = createTheme({
     MuiButton: {
       styleOverrides: { root: { textTransform: "none" } },
       defaultProps: { disableElevation: true },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&:first-of-type": { paddingTop: theme.spacing(2) },
+        }),
+      },
     },
     MuiLink: {
       styleOverrides: {
