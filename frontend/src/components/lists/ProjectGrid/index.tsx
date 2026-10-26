@@ -11,10 +11,9 @@ import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
 import StatusCard from "@/components/cards/StatusCard";
 import { sxArray } from "@/utils/sx";
 import { DEFAULT_LIMIT } from "@/constants";
-import type { Project, ProjectListRequestParams } from "@/types/projects";
+import type { Project } from "@/types/projects";
 
 export interface ProjectGridProps extends Omit<ImageListProps, "children"> {
-  params?: ProjectListRequestParams;
   projects: Project[];
   loading?: boolean;
   error?: Error | null;
@@ -30,7 +29,6 @@ export interface ProjectGridProps extends Omit<ImageListProps, "children"> {
 }
 
 const ProjectGrid: React.FC<ProjectGridProps> = ({
-  params,
   projects,
   loading,
   error,
@@ -48,7 +46,6 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
   const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const isMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
-  const skeletonCount = (params?.limit ?? DEFAULT_LIMIT) - 1;
   const isError = !!error;
   const isEmpty = !loading && !isFetchingNextPage && projects.length <= 0;
 
@@ -101,7 +98,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
         <ProjectGridSkeletonItem />
       </InfiniteScrollTrigger>
       {(!!loading || isFetchingNextPage) &&
-        Array.from({ length: skeletonCount }).map((_, index) => (
+        Array.from({ length: DEFAULT_LIMIT - 1 }).map((_, index) => (
           <ProjectGridSkeletonItem key={`skeleton-${index}`} />
         ))}
     </ImageList>

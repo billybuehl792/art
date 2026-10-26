@@ -62,7 +62,7 @@ export const projectUpdateSchema = z
   });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
-  category: projectCategoryEnum.nullable().optional(),
+  category: projectCategoryEnum.optional(),
 });
 
 export const projectListResponseSchema = listResponseSchema(projectSchema);

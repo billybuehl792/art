@@ -19,6 +19,7 @@ const createProjects = async (count = 100, uploads?: UploadResponse[]) => {
         title: `Test Project ${index}`,
         subtitle: `Test Subtitle ${index}`,
         description: `This is test project number ${index}.`,
+        category: index % 2 === 0 ? "art" : "dev",
         mediaType: upload?.mediaType,
         mediaUrl: upload?.mediaUrl,
         thumbnailUrl: upload?.thumbnailUrl,

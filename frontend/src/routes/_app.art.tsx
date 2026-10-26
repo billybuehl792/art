@@ -9,7 +9,9 @@ import ProjectGrid, {
 } from "@/components/lists/ProjectGrid";
 import { apiQueries } from "@/queries";
 import { idSchema } from "@/schemas/basic";
+import { projectListRequestParamsSchema } from "@/schemas/projects";
 
+const category = "art";
 const validateSearch = z.object({ project: idSchema.optional() });
 
 export const Route = createFileRoute("/_app/art")({
@@ -27,7 +29,9 @@ function RouteComponent() {
 
   /** Queries */
 
-  const projectListQuery = useInfiniteQuery(apiQueries.projects.get());
+  const projectListQuery = useInfiniteQuery(
+    apiQueries.projects.get(projectListRequestParamsSchema.parse({ category })),
+  );
 
   /** Data */
 
