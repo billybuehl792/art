@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
+  type ListProps,
   type StackProps,
 } from "@mui/material";
 import {
@@ -18,9 +19,14 @@ import ListItemButtonLink from "../links/ListItemButtonLink";
 
 interface NavListProps extends StackProps {
   onNavigate?: VoidFunction;
+  slotProps?: { list?: ListProps };
 }
 
-const NavList: React.FC<NavListProps> = ({ onNavigate, ...props }) => {
+const NavList: React.FC<NavListProps> = ({
+  onNavigate,
+  slotProps,
+  ...props
+}) => {
   /** Values */
 
   const buttonProps = useMemo(
@@ -33,7 +39,7 @@ const NavList: React.FC<NavListProps> = ({ onNavigate, ...props }) => {
 
   return (
     <Stack divider={<Divider />} {...props}>
-      <List>
+      <List {...slotProps?.list}>
         <ListItemButtonLink to="/" {...buttonProps}>
           <ListItemIcon children={<HomeIcon />} />
           <ListItemText primary="home" />

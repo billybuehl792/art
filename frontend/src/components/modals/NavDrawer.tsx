@@ -39,8 +39,8 @@ const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
 
       <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
         <NavList
-          disablePadding
           onNavigate={handleOnClose}
+          slotProps={{ list: { disablePadding: true } }}
           sx={{ flexGrow: 1 }}
         />
         <Stack

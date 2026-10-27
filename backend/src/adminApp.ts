@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import projects from "./routes/projects";
 import upload from "./routes/upload";
 import { errorHandler } from "./utils/error";
 import { UPLOAD_DIR } from "./constants/upload";
+import adminProjectsRouter from "./routes/admin/projects";
 
 const adminApp = express();
 
@@ -14,10 +14,10 @@ adminApp.get("/admin/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-adminApp.use("/admin/api/projects", projects);
-adminApp.use("/admin/api/upload", upload);
+adminApp.use("/admin/api/projects", adminProjectsRouter);
+// adminApp.use("/api/upload", upload);
 
-adminApp.use("/admin/uploads", express.static(UPLOAD_DIR));
+// adminApp.use("/uploads", express.static(UPLOAD_DIR));
 
 adminApp.use(errorHandler);
 
