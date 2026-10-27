@@ -1,9 +1,11 @@
 import React, { useMemo } from "react";
 import {
+  Divider,
   List,
   ListItemIcon,
   ListItemText,
-  type ListProps,
+  Stack,
+  type StackProps,
 } from "@mui/material";
 import {
   Home as HomeIcon,
@@ -14,7 +16,7 @@ import {
 } from "@mui/icons-material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
 
-interface NavListProps extends ListProps {
+interface NavListProps extends StackProps {
   onNavigate?: VoidFunction;
 }
 
@@ -30,32 +32,34 @@ const NavList: React.FC<NavListProps> = ({ onNavigate, ...props }) => {
   );
 
   return (
-    <List {...props}>
-      <ListItemButtonLink to="/" {...buttonProps}>
-        <ListItemIcon children={<HomeIcon />} />
-        <ListItemText primary="home" />
-      </ListItemButtonLink>
+    <Stack divider={<Divider />} {...props}>
+      <List>
+        <ListItemButtonLink to="/" {...buttonProps}>
+          <ListItemIcon children={<HomeIcon />} />
+          <ListItemText primary="home" />
+        </ListItemButtonLink>
 
-      <ListItemButtonLink to="/art" {...buttonProps}>
-        <ListItemIcon children={<BrushIcon />} />
-        <ListItemText primary="art" />
-      </ListItemButtonLink>
+        <ListItemButtonLink to="/art" {...buttonProps}>
+          <ListItemIcon children={<BrushIcon />} />
+          <ListItemText primary="art" />
+        </ListItemButtonLink>
 
-      <ListItemButtonLink to="/dev" {...buttonProps}>
-        <ListItemIcon children={<CodeIcon />} />
-        <ListItemText primary="dev" />
-      </ListItemButtonLink>
+        <ListItemButtonLink to="/dev" {...buttonProps}>
+          <ListItemIcon children={<CodeIcon />} />
+          <ListItemText primary="dev" />
+        </ListItemButtonLink>
 
-      <ListItemButtonLink to="/contact" {...buttonProps}>
-        <ListItemIcon children={<ContactPageIcon />} />
-        <ListItemText primary="contact" />
-      </ListItemButtonLink>
+        <ListItemButtonLink to="/contact" {...buttonProps}>
+          <ListItemIcon children={<ContactPageIcon />} />
+          <ListItemText primary="contact" />
+        </ListItemButtonLink>
 
-      <ListItemButtonLink to="/admin" {...buttonProps}>
-        <ListItemIcon children={<AdminIcon />} />
-        <ListItemText primary="admin" />
-      </ListItemButtonLink>
-    </List>
+        <ListItemButtonLink to="/admin" {...buttonProps}>
+          <ListItemIcon children={<AdminIcon />} />
+          <ListItemText primary="admin" />
+        </ListItemButtonLink>
+      </List>
+    </Stack>
   );
 };
 

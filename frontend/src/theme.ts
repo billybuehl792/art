@@ -75,6 +75,10 @@ export const createAppTheme = createTheme({
       styleOverrides: { root: { textTransform: "none" } },
       defaultProps: { disableElevation: true },
     },
+    MuiCard: { defaultProps: { variant: "outlined" } },
+    MuiCardHeader: {
+      styleOverrides: { title: ({ theme }) => ({ ...theme.typography.h3 }) },
+    },
     MuiDialogContent: {
       styleOverrides: {
         root: ({ theme }) => ({
@@ -124,7 +128,7 @@ export const createAppTheme = createTheme({
         root: ({ theme }) => ({
           minHeight: theme.layout.appBarHeight,
           borderBottom: `1px solid ${theme.palette.divider}`,
-          [`${theme.breakpoints.up("sm")}`]: {
+          [`@media (min-width: 0px) and (orientation: landscape)`]: {
             minHeight: theme.layout.appBarHeight,
           },
         }),

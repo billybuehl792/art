@@ -49,7 +49,7 @@ const StatusCard: React.FC<StatusCardProps> = ({
   }[status];
 
   return (
-    <Card variant="outlined" {...props}>
+    <Card {...props}>
       <CardContent>
         <Stack
           spacing={1}

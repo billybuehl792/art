@@ -18,7 +18,7 @@ const ProjectListItem: React.FC<ProjectListItemProps> = ({
   ...props
 }) => {
   return (
-    <Card variant="outlined" {...props}>
+    <Card {...props}>
       <CardContent>
         <Typography variant="h2" gutterBottom>
           {project.title}

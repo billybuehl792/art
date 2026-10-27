@@ -12,7 +12,6 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(async (response) => {
   if (MOCK_DELAY > 0)
     await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
-
   return response;
 });
 
