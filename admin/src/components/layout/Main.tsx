@@ -5,10 +5,6 @@ const Main = styled("main")(({ theme }) => ({
   top: theme.layout.appBarHeight,
   marginLeft: 0,
   paddingBottom: theme.layout.footerHeight,
-  [theme.breakpoints.up("sm")]: {
-    top: 0,
-    marginLeft: theme.layout.navPanelWidth,
-  },
 }));
 
 export default Main;

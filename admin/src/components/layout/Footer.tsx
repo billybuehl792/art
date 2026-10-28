@@ -16,7 +16,6 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   borderTop: `1px solid ${theme.palette.divider}`,
   zIndex: theme.zIndex.appBar,
-  [theme.breakpoints.up("sm")]: { left: theme.layout.navPanelWidth },
 }));
 
 const Footer: React.FC<BoxProps> = (props) => {
