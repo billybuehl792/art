@@ -13,8 +13,8 @@ import {
 } from "@mui/icons-material";
 import NavDrawer from "../modals/NavDrawer";
 import Link from "../links/Link";
-import { APP_TITLE } from "../../constants";
 import { truncateText } from "@/utils/sx";
+import { APP_TITLE } from "@/constants";
 
 const StyledStack = styled(Stack)(({ theme }) => ({
   position: "fixed",
@@ -33,7 +33,7 @@ const AppBar: React.FC<StackProps> = (props) => {
   /** Values */
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const isMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
+  const isSm = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 
   /** Callbacks */
 
@@ -41,7 +41,7 @@ const AppBar: React.FC<StackProps> = (props) => {
 
   return (
     <>
-      <StyledStack direction="row" {...props}>
+      <StyledStack component="header" direction="row" {...props}>
         <Container
           sx={{
             display: "flex",
@@ -60,7 +60,7 @@ const AppBar: React.FC<StackProps> = (props) => {
       <NavDrawer
         open={menuOpen}
         onClose={handleToggleMenuOpen}
-        {...(isMd && { anchor: "right" })}
+        {...(isSm && { anchor: "right" })}
       />
     </>
   );

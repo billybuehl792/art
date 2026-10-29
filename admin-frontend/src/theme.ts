@@ -1,5 +1,6 @@
 import "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
+import { drawerClasses } from "@mui/material";
 import { hexToRgba, toRgbaString } from "./utils/color";
 
 const DEFAULT_WHITE = "#f0f0f0";
@@ -85,6 +86,15 @@ export const createAppTheme = () =>
           root: ({ theme }) => ({
             "&:first-of-type": { paddingTop: theme.spacing(2) },
           }),
+        },
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          root: {
+            [`&.${drawerClasses.anchorRight} > .${drawerClasses.paper}`]: {
+              minWidth: 300,
+            },
+          },
         },
       },
       MuiLink: {

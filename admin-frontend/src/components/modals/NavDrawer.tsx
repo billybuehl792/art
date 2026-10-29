@@ -24,8 +24,7 @@ const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
         sx={{
           alignItems: "center",
           justifyContent: "space-between",
-          p: 1,
-          minWidth: 300,
+          p: 1.5,
         }}
       >
         <Typography variant="h2" sx={truncateText}>

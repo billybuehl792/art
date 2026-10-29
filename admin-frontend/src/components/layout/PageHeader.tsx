@@ -24,7 +24,6 @@ const StyledStack = styled(Stack)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   borderBottom: `1px solid ${theme.palette.divider}`,
   zIndex: theme.zIndex.appBar - 1,
-  [theme.breakpoints.up("sm")]: { top: 0 },
 }));
 
 const PageHeader: React.FC<PageHeaderProps> = ({
