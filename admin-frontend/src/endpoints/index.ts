@@ -1,4 +1,3 @@
-import adminApiClient from "@/api/adminClient";
 import apiClient from "@/api/client";
 import type { Login } from "@/types/admin";
 import type {
@@ -16,11 +15,11 @@ export const apiEndpoints = {
     get: (params?: ProjectListRequestParams) =>
       apiClient.get<ProjectListResponse>("/projects", { params }),
     post: (body: ProjectCreate) =>
-      adminApiClient.post<Project>("/projects", { body }),
+      apiClient.post<Project>("/projects", { body }),
     project: (id: Project["id"]) => ({
       get: () => apiClient.get<Project>(`/projects/${id}`),
       patch: (body: ProjectUpdate) =>
-        adminApiClient.patch<Project>(`/projects/${id}`, { body }),
+        apiClient.patch<Project>(`/projects/${id}`, { body }),
     }),
   },
 };

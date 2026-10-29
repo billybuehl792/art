@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": { target: env.VITE_API_URL, changeOrigin: true },
         "/uploads": { target: env.VITE_API_URL, changeOrigin: true },
-        "/admin/api": { target: env.VITE_ADMIN_API_URL, changeOrigin: true },
       },
     },
     build: {

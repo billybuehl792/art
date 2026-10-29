@@ -8,8 +8,8 @@ import {
   type ListProps,
   type StackProps,
 } from "@mui/material";
-import { Home as HomeIcon, Article as ArticleIcon } from "@mui/icons-material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
+import { HomeIcon, ProjectIcon } from "@/constants";
 
 interface NavListProps extends StackProps {
   onNavigate?: VoidFunction;
@@ -40,7 +40,7 @@ const NavList: React.FC<NavListProps> = ({
         </ListItemButtonLink>
 
         <ListItemButtonLink to="/projects" {...buttonProps}>
-          <ListItemIcon children={<ArticleIcon />} />
+          <ListItemIcon children={<ProjectIcon />} />
           <ListItemText primary="projects" />
         </ListItemButtonLink>
       </List>

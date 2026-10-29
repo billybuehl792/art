@@ -2,9 +2,7 @@ import fs from "node:fs/promises";
 import path from "path";
 import sharp from "sharp";
 import {
-  UPLOAD_DIR,
   UPLOAD_THUMBNAIL_DIR,
-  UPLOAD_URL,
   UPLOAD_THUMBNAIL_URL,
 } from "../constants/upload";
 
