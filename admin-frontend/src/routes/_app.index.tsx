@@ -10,7 +10,7 @@ import {
 import PageHeader from "@/components/layout/PageHeader";
 import CardActionAreaLink from "@/components/links/CardActionAreaLink";
 import { ProjectIcon } from "@/constants";
-import { truncateText } from "@/utils/sx";
+import { truncateText } from "@/utils";
 
 export const Route = createFileRoute("/_app/")({
   component: RouteComponent,

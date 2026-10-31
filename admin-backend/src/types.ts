@@ -9,11 +9,20 @@ import {
   projectListRequestParamsSchema,
   projectListResponseSchema,
   uploadResponseSchema,
+  filenameSchema,
+  authRequestSchema,
 } from "./schemas";
 
-export type Id = z.infer<typeof idSchema>;
+/** Basic */
 
-/** Requests */
+export type Id = z.infer<typeof idSchema>;
+export type Filename = z.infer<typeof filenameSchema>;
+
+/** Auth */
+
+export type AuthRequest = z.infer<typeof authRequestSchema>;
+
+/** Lists */
 
 export type ListRequestParams = z.infer<typeof listRequestParamsSchema>;
 export type ListResponse<T extends z.ZodType> = z.infer<

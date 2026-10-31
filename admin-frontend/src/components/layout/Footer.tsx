@@ -1,8 +1,8 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { Box, Typography, type BoxProps } from "@mui/material";
-import { APP_TITLE } from "../../constants";
-import { truncateText } from "../../utils/sx";
+import { truncateText } from "@/utils";
+import { APP_TITLE } from "@/constants";
 
 const StyledBox = styled(Box)(({ theme }) => ({
   position: "fixed",

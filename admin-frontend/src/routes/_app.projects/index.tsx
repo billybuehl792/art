@@ -5,7 +5,7 @@ import ProjectList, {
   type ProjectListProps,
 } from "@/components/lists/ProjectList";
 import PageHeader from "@/components/layout/PageHeader";
-import { apiQueries } from "@/queries";
+import queries from "@/queries";
 
 export const Route = createFileRoute("/_app/projects/")({
   component: RouteComponent,
@@ -18,7 +18,7 @@ function RouteComponent() {
 
   /** Queries */
 
-  const projectListQuery = useInfiniteQuery(apiQueries.projects.get());
+  const projectListQuery = useInfiniteQuery(queries.projects.get());
 
   /** Data */
 

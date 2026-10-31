@@ -140,6 +140,7 @@ export const updateProject = async (id: Id, body: ProjectUpdate) => {
 
   if (fields.length === 0) throw new Error("No fields to update");
 
+  addField("updated_at", new Date());
   values.push(id);
 
   const where = `WHERE id = $${values.length}`;

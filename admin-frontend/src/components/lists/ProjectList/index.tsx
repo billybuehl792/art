@@ -5,7 +5,7 @@ import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
 import ProjectListItemSkeleton from "./ProjectListItemSkeleton";
 import StatusCard from "@/components/cards/StatusCard";
 import { DEFAULT_LIMIT } from "@/constants";
-import type { Project } from "@/types/projects";
+import type { Project } from "@/types";
 
 export interface ProjectListProps extends StackProps {
   projects: Project[];

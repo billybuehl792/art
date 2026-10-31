@@ -13,7 +13,7 @@ import {
 } from "@mui/icons-material";
 import NavDrawer from "../modals/NavDrawer";
 import Link from "../links/Link";
-import { truncateText } from "@/utils/sx";
+import { truncateText } from "@/utils";
 import { APP_TITLE } from "@/constants";
 
 const StyledStack = styled(Stack)(({ theme }) => ({

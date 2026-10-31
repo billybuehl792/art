@@ -1,26 +1,45 @@
 import { z } from "zod";
-import { listRequestParamsSchema, listResponseSchema } from "./pagination";
-import { idSchema } from "./basic";
+import { DEFAULT_LIMIT } from "@/constants";
 
-const projectCategoryEnum = z.enum(["art", "dev"]);
+/** Basic */
+
+export const idSchema = z.coerce.number().int().positive();
+
+export const loginSchema = z.object({
+  email: z.email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const listRequestParamsSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(DEFAULT_LIMIT),
+});
+
+export function listResponseSchema<T extends z.ZodType>(itemSchema: T) {
+  return z.object({
+    page: z.number().int().min(1),
+    limit: z.number().int().min(1),
+    total: z.number().int().min(0),
+    results: z.array(itemSchema),
+  });
+}
+
+/** Projects  */
+
+export const projectCategoryEnum = z.enum(["art", "dev"]);
 
 export const projectSchema = z.object({
   id: idSchema,
-
   title: z.string(),
   subtitle: z.string(),
   description: z.string(),
-
   category: projectCategoryEnum.nullable(),
   link: z.string().nullable(),
-
   mediaType: z.string().nullable(),
   mediaUrl: z.string().nullable(),
   thumbnailUrl: z.string().nullable(),
-
-  priority: z.coerce.number(),
-  sortOrder: z.number(),
-
+  priority: z.number().nonnegative(),
+  sortOrder: z.number().nonnegative(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -29,14 +48,11 @@ export const projectCreateSchema = z.object({
   title: z.string().trim().min(1),
   subtitle: z.string().optional().default(""),
   description: z.string().optional().default(""),
-
   category: projectCategoryEnum.nullable().optional(),
   link: z.string().nullable().optional(),
-
   mediaType: z.string().nullable().optional(),
   mediaUrl: z.string().nullable().optional(),
   thumbnailUrl: z.string().nullable().optional(),
-
   priority: z.coerce.number().int().positive().optional().default(1),
   sortOrder: z.coerce.number().int().min(0).optional().default(0),
 });
@@ -46,14 +62,11 @@ export const projectUpdateSchema = z
     title: z.string().trim().min(1).optional(),
     subtitle: z.string().optional(),
     description: z.string().optional(),
-
     category: projectCategoryEnum.optional(),
     link: z.string().nullable().optional(),
-
     mediaType: z.string().nullable().optional(),
     mediaUrl: z.string().nullable().optional(),
     thumbnailUrl: z.string().nullable().optional(),
-
     priority: z.coerce.number().int().positive().optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
   })
@@ -66,3 +79,11 @@ export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
 });
 
 export const projectListResponseSchema = listResponseSchema(projectSchema);
+
+/** Uploads */
+
+export const uploadResponseSchema = z.object({
+  mediaType: z.string(),
+  mediaUrl: z.string(),
+  thumbnailUrl: z.string(),
+});

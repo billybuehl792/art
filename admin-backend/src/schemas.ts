@@ -1,8 +1,23 @@
+import path from "path";
 import { z } from "zod";
 
 export const idSchema = z.coerce.number().int().positive();
 
-/** Requests */
+export const filenameSchema = z
+  .string()
+  .min(1)
+  .refine((filename) => filename === path.basename(filename), {
+    message: "Invalid filename",
+  });
+
+/** Auth */
+
+export const authRequestSchema = z.object({
+  username: z.string().trim().min(1),
+  password: z.string().trim().min(1),
+});
+
+/** Lists */
 
 export const listRequestParamsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

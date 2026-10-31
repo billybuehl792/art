@@ -8,7 +8,7 @@ import {
   Typography,
   type CardProps,
 } from "@mui/material";
-import type { Project } from "@/types/projects";
+import type { Project } from "@/types";
 
 export interface ProjectListItemProps extends Omit<CardProps, "onClick"> {
   project: Project;

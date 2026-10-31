@@ -1,7 +1,6 @@
 import "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import { drawerClasses } from "@mui/material";
-import { hexToRgba, toRgbaString } from "./utils/color";
 
 const DEFAULT_WHITE = "#f0f0f0";
 const DEFAULT_BLACK = "#141414";
@@ -97,20 +96,7 @@ export const createAppTheme = () =>
           },
         },
       },
-      MuiLink: {
-        styleOverrides: {
-          root: ({ theme }) => ({
-            transition: "color 0.2s ease",
-            ":hover": {
-              color: toRgbaString(hexToRgba(theme.palette.text.primary, 0.4)),
-            },
-            ":active": {
-              color: toRgbaString(hexToRgba(theme.palette.text.primary, 0.25)),
-            },
-          }),
-        },
-        defaultProps: { underline: "none" },
-      },
+      MuiLink: { defaultProps: { underline: "none" } },
       MuiListItemButton: {
         styleOverrides: {
           root: ({ theme }) => ({

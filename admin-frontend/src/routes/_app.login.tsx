@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, Container } from "@mui/material";
 import LoginForm, { type LoginFormProps } from "@/components/forms/LoginForm";
-import { apiQueries } from "@/queries";
+import queries from "@/queries";
 
 export const Route = createFileRoute("/_app/login")({
   component: RouteComponent,
@@ -15,7 +15,7 @@ function RouteComponent() {
 
   /** Mutations */
 
-  const loginMutation = useMutation(apiQueries.admin.login());
+  const loginMutation = useMutation(queries.auth.post());
 
   /** Callbacks */
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, type BoxProps } from "@mui/material";
 import StatusCard, { type StatusCardProps } from "../cards/StatusCard";
-import { sxArray } from "@/utils/sx";
+import { sxArray } from "@/utils";
 
 interface LoadingScreenProps extends BoxProps {
   fullScreen?: boolean;

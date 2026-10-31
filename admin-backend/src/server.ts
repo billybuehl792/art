@@ -16,12 +16,14 @@ const start = async () => {
 
   await testDatabaseConnection();
 
-  const url = "0.0.0.0";
+  const host = process.env.HOST;
+  if (!host) throw new Error("HOST is not configured");
+
   const port = process.env.PORT;
   if (!port) throw new Error("PORT is not configured");
 
-  app.listen(Number(port), "0.0.0.0", () => {
-    console.log(`Admin Server running at http://${url}:${port}`);
+  app.listen(Number(port), host, () => {
+    console.log(`Admin Server running at http://${host}:${port}`);
   });
 };
 
