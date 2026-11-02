@@ -36,6 +36,17 @@ const queries = {
             : undefined;
         },
       }),
+    post: () =>
+      mutationOptions({
+        mutationKey: ["projects", "post"],
+        mutationFn: endpoints.projects.post,
+      }),
+    delete: () =>
+      mutationOptions({
+        mutationKey: ["projects", "delete"],
+        mutationFn: (id: Project["id"]) =>
+          endpoints.projects.project(id).delete(),
+      }),
     project: (id: Project["id"]) => ({
       get: () =>
         queryOptions({
@@ -44,8 +55,13 @@ const queries = {
         }),
       patch: () =>
         mutationOptions({
-          mutationKey: ["projects", id],
+          mutationKey: ["projects", "patch", id],
           mutationFn: endpoints.projects.project(id).patch,
+        }),
+      delete: () =>
+        mutationOptions({
+          mutationKey: ["projects", "delete", id],
+          mutationFn: endpoints.projects.project(id).delete,
         }),
     }),
   },

@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import type { SvgIconComponent } from "@mui/icons-material";
 import {
   uploadResponseSchema,
   type idSchema,
@@ -15,6 +16,25 @@ import {
 /** Basic */
 
 export type Id = z.infer<typeof idSchema>;
+
+type MenuItemColor =
+  | "inherit"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "warning"
+  | "info"
+  | "success";
+
+export interface MenuOption {
+  id: string;
+  render?: boolean;
+  title: string;
+  subtitle?: string;
+  color?: MenuItemColor;
+  Icon: SvgIconComponent;
+  onClick: VoidFunction;
+}
 
 /** Lists */
 

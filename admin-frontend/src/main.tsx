@@ -16,6 +16,7 @@ import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./theme";
 import LoadingScreen from "./components/layout/LoadingScreen";
 import ErrorScreen from "./components/layout/ErrorScreen";
+import ConfirmProvider from "./providers/ConfirmProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -43,8 +44,10 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <ThemeProvider theme={createAppTheme()} defaultMode="dark">
         <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <RouterProvider router={router} />
+          <ConfirmProvider>
+            <CssBaseline />
+            <RouterProvider router={router} />
+          </ConfirmProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </StrictMode>,

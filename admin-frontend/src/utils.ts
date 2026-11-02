@@ -33,3 +33,18 @@ export const downloadFile = async (url: string, filename: string) => {
 
   URL.revokeObjectURL(blobUrl);
 };
+
+export const urlToFile = async (
+  url: string,
+  filename?: string,
+): Promise<File> => {
+  const response = await fetch(url);
+
+  if (!response.ok) throw new Error("Failed to fetch image");
+
+  const blob = await response.blob();
+
+  return new File([blob], filename ?? url.split("/").pop() ?? "image", {
+    type: blob.type,
+  });
+};

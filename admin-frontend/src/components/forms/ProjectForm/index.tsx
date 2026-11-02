@@ -11,6 +11,7 @@ import {
   type BoxProps,
 } from "@mui/material";
 import { projectCategoryEnum } from "@/schemas";
+import FileUploadField from "@/components/fields/FileUploadField";
 
 const projectFormSchema = z.object({
   title: z.string().trim().min(1),
@@ -18,6 +19,8 @@ const projectFormSchema = z.object({
   description: z.string(),
   category: projectCategoryEnum.nullable(),
   link: z.string().nullable(),
+  media: z.custom<File>((value) => value instanceof File).nullable(),
+  thumbnail: z.custom<File>((value) => value instanceof File).nullable(),
   priority: z.number().nonnegative(),
   sortOrder: z.number().nonnegative(),
 });
@@ -29,6 +32,8 @@ const DEFAULT_VALUES: ProjectFormValues = {
   subtitle: "",
   description: "",
   category: null,
+  media: null,
+  thumbnail: null,
   link: null,
   priority: 1,
   sortOrder: 0,
@@ -98,6 +103,41 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               helperText={field.state.meta.errors[0]?.message}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
+            />
+          )}
+        </form.Field>
+        <form.Field name="description">
+          {(field) => (
+            <TextField
+              label="Description"
+              size="small"
+              multiline
+              rows={3}
+              value={field.state.value}
+              error={field.state.meta.isTouched && !field.state.meta.isValid}
+              helperText={field.state.meta.errors[0]?.message}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="media">
+          {(field) => (
+            <FileUploadField
+              label="Media"
+              value={field.state.value}
+              onChange={field.handleChange}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="thumbnail">
+          {(field) => (
+            <FileUploadField
+              label="Thumbnail"
+              value={field.state.value}
+              onChange={field.handleChange}
             />
           )}
         </form.Field>
