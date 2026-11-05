@@ -2,7 +2,6 @@ import React from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import {
-  Alert,
   Box,
   Button,
   Divider,
@@ -10,8 +9,10 @@ import {
   TextField,
   type BoxProps,
 } from "@mui/material";
-import { projectCategoryEnum } from "@/schemas";
 import FileUploadField from "@/components/fields/FileUploadField";
+import { projectCategoryEnum } from "@/schemas";
+import { useBlocker } from "@tanstack/react-router";
+import { useConfirm } from "@/providers/ConfirmProvider";
 
 const projectFormSchema = z.object({
   title: z.string().trim().min(1),
@@ -20,7 +21,6 @@ const projectFormSchema = z.object({
   category: projectCategoryEnum.nullable(),
   link: z.string().nullable(),
   media: z.custom<File>((value) => value instanceof File).nullable(),
-  thumbnail: z.custom<File>((value) => value instanceof File).nullable(),
   priority: z.number().nonnegative(),
   sortOrder: z.number().nonnegative(),
 });
@@ -33,7 +33,6 @@ const DEFAULT_VALUES: ProjectFormValues = {
   description: "",
   category: null,
   media: null,
-  thumbnail: null,
   link: null,
   priority: 1,
   sortOrder: 0,
@@ -44,18 +43,19 @@ export interface ProjectFormProps extends Omit<
   "component" | "onSubmit"
 > {
   defaultValues?: ProjectFormValues;
-  error?: Error | null;
   onSubmit: (values: ProjectFormValues) => Promise<void>;
+  onCancel?: VoidFunction;
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({
   defaultValues,
-  error,
   onSubmit,
+  onCancel,
   ...props
 }) => {
   /** Values */
 
+  const confirm = useConfirm();
   const form = useForm({
     defaultValues: {
       ...DEFAULT_VALUES,
@@ -65,6 +65,19 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     onSubmit: async ({ value }) => {
       await onSubmit(value);
     },
+  });
+
+  /** Effects */
+
+  useBlocker({
+    enableBeforeUnload: form.state.isDirty,
+    shouldBlockFn: () =>
+      form.state.isDirty
+        ? confirm({
+            title: "Unsaved Changes",
+            description: "Are you sure you want to exit?",
+          }).then((res) => !res)
+        : false,
   });
 
   return (
@@ -86,6 +99,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               label="Title"
               size="small"
               value={field.state.value}
+              disabled={field.form.state.isSubmitting}
               error={field.state.meta.isTouched && !field.state.meta.isValid}
               helperText={field.state.meta.errors[0]?.message}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -99,6 +113,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               label="Subtitle"
               size="small"
               value={field.state.value}
+              disabled={field.form.state.isSubmitting}
               error={field.state.meta.isTouched && !field.state.meta.isValid}
               helperText={field.state.meta.errors[0]?.message}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -114,6 +129,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               multiline
               rows={3}
               value={field.state.value}
+              disabled={field.form.state.isSubmitting}
               error={field.state.meta.isTouched && !field.state.meta.isValid}
               helperText={field.state.meta.errors[0]?.message}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -126,16 +142,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           {(field) => (
             <FileUploadField
               label="Media"
-              value={field.state.value}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="thumbnail">
-          {(field) => (
-            <FileUploadField
-              label="Thumbnail"
+              disabled={field.form.state.isSubmitting}
               value={field.state.value}
               onChange={field.handleChange}
             />
@@ -151,6 +158,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               size="small"
               type="number"
               value={field.state.value}
+              disabled={field.form.state.isSubmitting}
               error={field.state.meta.isTouched && !field.state.meta.isValid}
               helperText={field.state.meta.errors[0]?.message}
               onChange={(e) => field.handleChange(Number(e.target.value))}
@@ -159,25 +167,27 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
           )}
         </form.Field>
 
-        {!!error && <Alert severity="error">{error.message}</Alert>}
-
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
-          {([canSubmit, isSubmitting]) => (
-            <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
+        <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
+          {!!onCancel && (
+            <Button color="error" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
               <Button
                 type="submit"
                 variant="contained"
                 loading={isSubmitting}
                 disabled={!canSubmit}
-                sx={{ px: 4 }}
               >
                 Submit
               </Button>
-            </Stack>
-          )}
-        </form.Subscribe>
+            )}
+          </form.Subscribe>
+        </Stack>
       </Stack>
     </Box>
   );

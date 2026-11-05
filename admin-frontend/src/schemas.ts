@@ -50,8 +50,9 @@ export const projectCreateSchema = z.object({
   description: z.string().optional().default(""),
   category: projectCategoryEnum.nullable().optional(),
   link: z.string().nullable().optional(),
-  media: z.instanceof(File).nullable().optional(),
-  thumbnail: z.instanceof(File).nullable().optional(),
+  mediaType: z.string().nullable().optional(),
+  mediaUrl: z.string().nullable().optional(),
+  thumbnailUrl: z.string().nullable().optional(),
   priority: z.coerce.number().int().positive().optional().default(1),
   sortOrder: z.coerce.number().int().min(0).optional().default(0),
 });
@@ -63,8 +64,9 @@ export const projectUpdateSchema = z
     description: z.string().optional(),
     category: projectCategoryEnum.nullable().optional(),
     link: z.string().nullable().optional(),
-    media: z.instanceof(File).nullable().optional(),
-    thumbnail: z.instanceof(File).nullable().optional(),
+    mediaType: z.string().nullable().optional(),
+    mediaUrl: z.string().nullable().optional(),
+    thumbnailUrl: z.string().nullable().optional(),
     priority: z.coerce.number().int().positive().optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
   })
@@ -80,6 +82,9 @@ export const projectListResponseSchema = listResponseSchema(projectSchema);
 
 /** Uploads */
 
+export const uploadCreateSchema = z.object({
+  file: z.custom<File>((value) => value instanceof File),
+});
 export const uploadResponseSchema = z.object({
   mediaType: z.string(),
   mediaUrl: z.string(),

@@ -44,7 +44,6 @@ export const getThumbnailFilename = (filename: string) => {
 export const generateThumbnail = async (file: Express.Multer.File) => {
   const thumbnailFilename = getThumbnailFilename(file.filename);
   const thumbnailPath = path.join(UPLOAD_THUMBNAIL_DIR, thumbnailFilename);
-  const thumbnailUrl = path.join(UPLOAD_THUMBNAIL_URL, thumbnailFilename);
 
   await sharp(file.path)
     .resize({ width: 600, withoutEnlargement: true })
@@ -54,7 +53,6 @@ export const generateThumbnail = async (file: Express.Multer.File) => {
   return {
     filename: thumbnailFilename,
     path: thumbnailPath,
-    url: thumbnailUrl,
   };
 };
 

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
-import { Breadcrumbs, Container } from "@mui/material";
+import { Breadcrumbs, Container, Typography } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import Link from "@/components/links/Link";
 import ProjectList, {
@@ -51,7 +51,7 @@ function RouteComponent() {
     if (!confirmed) return;
 
     await projectDeleteMutation.mutateAsync(project.id, {
-      onSuccess: () => navigate({ to: "/projects" }),
+      onSuccess: () => projectListQuery.refetch(),
     });
   };
 
@@ -77,7 +77,7 @@ function RouteComponent() {
       <PageHeader
         title={
           <Breadcrumbs sx={{ flexGrow: 1 }}>
-            <Link to="/projects">Projects</Link>
+            <Typography>Projects</Typography>
           </Breadcrumbs>
         }
         endContent={<Link to="/projects/create">Create</Link>}

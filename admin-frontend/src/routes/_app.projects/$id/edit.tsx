@@ -1,4 +1,9 @@
-import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  notFound,
+  useCanGoBack,
+  useRouter,
+} from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import {
   Breadcrumbs,
@@ -17,11 +22,12 @@ import ProjectForm, {
 } from "@/components/forms/ProjectForm";
 import { useConfirm } from "@/providers/ConfirmProvider";
 import queries from "@/queries";
-import { idSchema, projectUpdateSchema } from "@/schemas";
-import { urlToFile } from "@/utils";
+import { idSchema, projectUpdateSchema, uploadCreateSchema } from "@/schemas";
+import { isSameFile, urlToFile } from "@/utils";
 import type { MenuOption } from "@/types";
 
 export const Route = createFileRoute("/_app/projects/$id/edit")({
+  component: RouteComponent,
   loader: async ({ params, context }) => {
     const idParse = idSchema.safeParse(params.id);
     if (!idParse.success) throw notFound();
@@ -31,21 +37,14 @@ export const Route = createFileRoute("/_app/projects/$id/edit")({
     );
 
     let media: File | null = null;
-    let thumbnail: File | null = null;
     try {
-      media = data.mediaUrl
-        ? await urlToFile(data.mediaUrl ?? "", "media.png")
-        : null;
-      thumbnail = data.thumbnailUrl
-        ? await urlToFile(data.thumbnailUrl ?? "", "thumbnail.png")
-        : null;
+      media = data.mediaUrl ? await urlToFile(data.mediaUrl) : null;
     } catch (error) {
       console.error("Failed to fetch media or thumbnail:", error);
     }
 
-    return { ...data, media, thumbnail };
+    return { ...data, media };
   },
-  component: RouteComponent,
 });
 
 function RouteComponent() {
@@ -54,6 +53,7 @@ function RouteComponent() {
   const router = useRouter();
   const navigate = Route.useNavigate();
   const project = Route.useLoaderData();
+  const canGoBack = useCanGoBack();
   const confirm = useConfirm();
 
   /** Mutations */
@@ -64,13 +64,44 @@ function RouteComponent() {
   const projectDeleteMutation = useMutation(
     queries.projects.project(project.id).delete(),
   );
+  const uploadCreateMutation = useMutation(queries.uploads.post());
 
   /** Callbacks */
 
-  const handleUpdateProject: ProjectFormProps["onSubmit"] = async (data) => {
-    await projectUpdateMutation.mutateAsync(projectUpdateSchema.parse(data), {
-      onSuccess: () => router.invalidate(),
-    });
+  const handleBack = () => {
+    if (canGoBack) router.history.back();
+    else router.navigate({ to: "/projects" });
+  };
+
+  const handleUpdateProject: ProjectFormProps["onSubmit"] = async ({
+    media,
+    ...data
+  }) => {
+    let mediaBody;
+
+    if (media === null) {
+      mediaBody = { mediaType: null, mediaUrl: null, thumbnailUrl: null };
+    } else {
+      const isSameMediaFile = project.media && isSameFile(media, project.media);
+      if (!isSameMediaFile) {
+        const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
+          uploadCreateSchema.parse({ file: media }),
+        );
+        mediaBody = mediaUploadResponse.data;
+      }
+    }
+
+    await projectUpdateMutation.mutateAsync(
+      projectUpdateSchema.parse({ ...data, ...mediaBody }),
+      {
+        onSuccess: (res) =>
+          navigate({
+            to: "/projects/$id",
+            params: { id: String(res.data.id) },
+            ignoreBlocker: true,
+          }),
+      },
+    );
   };
 
   const handleDeleteProject = async () => {
@@ -117,18 +148,9 @@ function RouteComponent() {
         <Card>
           <CardContent>
             <ProjectForm
-              defaultValues={{
-                title: project.title,
-                subtitle: project.subtitle,
-                description: project.description,
-                category: project.category,
-                media: project.media,
-                thumbnail: project.thumbnail,
-                link: project.link,
-                priority: project.priority,
-                sortOrder: project.sortOrder,
-              }}
+              defaultValues={project}
               onSubmit={handleUpdateProject}
+              onCancel={handleBack}
             />
           </CardContent>
         </Card>

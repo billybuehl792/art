@@ -80,74 +80,22 @@ app.get("/api/projects/:id", async (req: Request, res: Response) => {
   return res.status(200).json(project);
 });
 
-app.post(
-  "/api/projects",
-  uploadFile.fields([
-    { name: "media", maxCount: 1 },
-    { name: "thumbnail", maxCount: 1 },
-  ]),
-  async (req: Request, res: Response) => {
-    const files = req.files as {
-      media?: Express.Multer.File[];
-      thumbnail?: Express.Multer.File[];
-    };
-    const media = files.media?.[0];
-    const thumbnail =
-      files.thumbnail?.[0] ?? (media ? await generateThumbnail(media) : null);
+app.post("/api/projects", async (req: Request, res: Response) => {
+  const body = projectCreateSchema.parse(req.body);
 
-    const mediaType = media?.mimetype ?? null;
-    const mediaUrl = media ? path.join(UPLOAD_URL, media.filename) : null;
-    const thumbnailUrl = thumbnail
-      ? path.join(UPLOAD_THUMBNAIL_URL, thumbnail.filename)
-      : null;
+  const project = await createProject(body);
 
-    const body = projectCreateSchema.parse({
-      ...req.body,
-      mediaType,
-      mediaUrl,
-      thumbnailUrl,
-    });
+  res.status(201).json(project);
+});
 
-    const project = await createProject(body);
+app.patch("/api/projects/:id", async (req: Request, res: Response) => {
+  const projectId = idSchema.parse(req.params.id);
+  const body = projectUpdateSchema.parse(req.body);
 
-    res.status(201).json(project);
-  },
-);
+  const project = await updateProject(projectId, body);
 
-app.patch(
-  "/api/projects/:id",
-  uploadFile.fields([
-    { name: "media", maxCount: 1 },
-    { name: "thumbnail", maxCount: 1 },
-  ]),
-  async (req: Request, res: Response) => {
-    const files = req.files as {
-      media?: Express.Multer.File[];
-      thumbnail?: Express.Multer.File[];
-    };
-    const media = files.media?.[0];
-    const thumbnail =
-      files.thumbnail?.[0] ?? (media ? await generateThumbnail(media) : null);
-
-    const mediaType = media?.mimetype ?? null;
-    const mediaUrl = media ? path.join(UPLOAD_URL, media.filename) : null;
-    const thumbnailUrl = thumbnail
-      ? path.join(UPLOAD_THUMBNAIL_URL, thumbnail.filename)
-      : null;
-
-    const projectId = idSchema.parse(req.params.id);
-    const body = projectUpdateSchema.parse({
-      ...req.body,
-      mediaType,
-      mediaUrl,
-      thumbnailUrl,
-    });
-
-    const project = await updateProject(projectId, body);
-
-    return res.status(200).json(project);
-  },
-);
+  return res.status(200).json(project);
+});
 
 app.delete("/api/projects/:id", async (req: Request, res: Response) => {
   const id = idSchema.parse(req.params.id);
@@ -169,9 +117,11 @@ app.post(
     const thumbnail = await generateThumbnail(req.file);
 
     const response = uploadResponseSchema.parse({
-      mediaType: req.file.mimetype,
-      mediaUrl: path.join(UPLOAD_URL, req.file.filename),
-      thumbnailUrl: thumbnail.url,
+      mediaType: req.file?.mimetype,
+      mediaUrl: req.file ? path.join(UPLOAD_URL, req.file.filename) : undefined,
+      thumbnailUrl: thumbnail
+        ? path.join(UPLOAD_THUMBNAIL_URL, thumbnail.filename)
+        : undefined,
     });
 
     return res.status(200).json(response);

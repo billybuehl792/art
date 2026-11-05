@@ -4,6 +4,7 @@ import {
   Breadcrumbs,
   Card,
   CardContent,
+  CardMedia,
   Container,
   Stack,
   Typography,
@@ -95,8 +96,26 @@ function RouteComponent() {
       />
       <Stack sx={{ my: 2 }}>
         <Card>
+          {!!project.mediaUrl && (
+            <CardMedia
+              component="img"
+              height="194"
+              image={project.mediaUrl}
+              sx={{ objectFit: "contain" }}
+            />
+          )}
           <CardContent>
-            <Typography>{project.title}</Typography>
+            <Stack spacing={1}>
+              <Typography variant="h2">{project.title}</Typography>
+              {!!project.subtitle && (
+                <Typography variant="h4">{project.subtitle}</Typography>
+              )}
+              {!!project.description && (
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {project.description}
+                </Typography>
+              )}
+            </Stack>
           </CardContent>
         </Card>
       </Stack>

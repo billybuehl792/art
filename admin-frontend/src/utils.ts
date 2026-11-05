@@ -34,17 +34,22 @@ export const downloadFile = async (url: string, filename: string) => {
   URL.revokeObjectURL(blobUrl);
 };
 
-export const urlToFile = async (
-  url: string,
-  filename?: string,
-): Promise<File> => {
+export const urlToFile = async (url: string): Promise<File> => {
   const response = await fetch(url);
 
   if (!response.ok) throw new Error("Failed to fetch image");
 
   const blob = await response.blob();
 
-  return new File([blob], filename ?? url.split("/").pop() ?? "image", {
+  return new File([blob], url.split("/").pop() ?? "image", {
     type: blob.type,
   });
+};
+
+export const isSameFile = (file1: File, file2: File) => {
+  return (
+    file1.name === file2.name &&
+    file1.size === file2.size &&
+    file1.type === file2.type
+  );
 };

@@ -1,21 +1,20 @@
 import type { z } from "zod";
 import type { SvgIconComponent } from "@mui/icons-material";
-import {
+import type {
+  uploadCreateSchema,
   uploadResponseSchema,
-  type idSchema,
-  type listRequestParamsSchema,
-  type listResponseSchema,
-  type loginSchema,
-  type projectCreateSchema,
-  type projectListRequestParamsSchema,
-  type projectListResponseSchema,
-  type projectSchema,
-  type projectUpdateSchema,
+  idSchema,
+  listRequestParamsSchema,
+  listResponseSchema,
+  loginSchema,
+  projectCreateSchema,
+  projectListRequestParamsSchema,
+  projectListResponseSchema,
+  projectSchema,
+  projectUpdateSchema,
 } from "./schemas";
 
 /** Basic */
-
-export type Id = z.infer<typeof idSchema>;
 
 type MenuItemColor =
   | "inherit"
@@ -35,6 +34,8 @@ export interface MenuOption {
   Icon: SvgIconComponent;
   onClick: VoidFunction;
 }
+
+export type Id = z.infer<typeof idSchema>;
 
 /** Lists */
 
@@ -60,4 +61,5 @@ export type ProjectListResponse = z.infer<typeof projectListResponseSchema>;
 
 /** Uploads */
 
+export type UploadCreate = z.infer<typeof uploadCreateSchema>;
 export type UploadResponse = z.infer<typeof uploadResponseSchema>;

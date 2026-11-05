@@ -77,6 +77,11 @@ export const createAppTheme = () =>
         defaultProps: { disableElevation: true },
       },
       MuiCard: { defaultProps: { variant: "outlined" } },
+      MuiCardActionArea: {
+        styleOverrides: {
+          root: { "&.Mui-disabled": { opacity: 0.5, cursor: "not-allowed" } },
+        },
+      },
       MuiCardHeader: {
         styleOverrides: { title: ({ theme }) => ({ ...theme.typography.h3 }) },
       },

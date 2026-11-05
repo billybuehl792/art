@@ -6,6 +6,7 @@ import type {
   ProjectListRequestParams,
   ProjectListResponse,
   ProjectUpdate,
+  UploadCreate,
   UploadResponse,
 } from "./types";
 
@@ -15,44 +16,18 @@ const endpoints = {
   projects: {
     get: (params?: ProjectListRequestParams) =>
       apiClient.get<ProjectListResponse>("/projects", { params }),
-    post: (body: ProjectCreate) => {
-      const { media, thumbnail, ...values } = body;
-      const formData = new FormData();
-
-      Object.entries(values).forEach(([key, value]) => {
-        if (value !== undefined && value !== null)
-          formData.append(key, String(value));
-      });
-
-      if (media) formData.append("media", media);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
-
-      return apiClient.post<Project>("/projects", formData);
-    },
+    post: (body: ProjectCreate) => apiClient.post<Project>("/projects", body),
     project: (id: Project["id"]) => ({
       get: () => apiClient.get<Project>(`/projects/${id}`),
-      patch: (body: ProjectUpdate) => {
-        const { media, thumbnail, ...values } = body;
-        const formData = new FormData();
-
-        Object.entries(values).forEach(([key, value]) => {
-          if (value !== undefined && value !== null)
-            formData.append(key, String(value));
-        });
-
-        if (media) formData.append("media", media);
-        if (thumbnail) formData.append("thumbnail", thumbnail);
-
-        return apiClient.patch<Project>(`/projects/${id}`, formData);
-      },
+      patch: (body: ProjectUpdate) =>
+        apiClient.patch<Project>(`/projects/${id}`, body),
       delete: () => apiClient.delete<void>(`/projects/${id}`),
     }),
   },
   uploads: {
-    post: (file: File) => {
+    post: (body: UploadCreate) => {
       const formData = new FormData();
-      formData.append("file", file);
-
+      formData.append("file", body.file);
       return apiClient.post<UploadResponse>("/uploads", formData);
     },
     delete: (filename: string) => apiClient.delete<void>(`/uploads${filename}`),

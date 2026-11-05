@@ -1,4 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useCanGoBack,
+  useRouter,
+} from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import {
   Breadcrumbs,
@@ -14,7 +18,7 @@ import ProjectForm, {
 import PageHeader from "@/components/layout/PageHeader";
 import Link from "@/components/links/Link";
 import queries from "@/queries";
-import { projectCreateSchema } from "@/schemas";
+import { projectCreateSchema, uploadCreateSchema } from "@/schemas";
 
 export const Route = createFileRoute("/_app/projects/create")({
   component: RouteComponent,
@@ -23,19 +27,46 @@ export const Route = createFileRoute("/_app/projects/create")({
 function RouteComponent() {
   /** Values */
 
+  const router = useRouter();
   const navigate = Route.useNavigate();
+  const canGoBack = useCanGoBack();
 
   /** Mutations */
 
   const projectCreateMutation = useMutation(queries.projects.post());
+  const uploadCreateMutation = useMutation(queries.uploads.post());
 
   /** Callbacks */
 
-  const handleCreateProject: ProjectFormProps["onSubmit"] = async (data) => {
-    await projectCreateMutation.mutateAsync(projectCreateSchema.parse(data), {
-      onSuccess: (res) =>
-        navigate({ to: "/projects/$id", params: { id: String(res.data.id) } }),
-    });
+  const handleBack = () => {
+    if (canGoBack) router.history.back();
+    else router.navigate({ to: "/projects" });
+  };
+
+  const handleCreateProject: ProjectFormProps["onSubmit"] = async ({
+    media,
+    ...data
+  }) => {
+    let mediaBody;
+
+    if (media) {
+      const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
+        uploadCreateSchema.parse({ file: media }),
+      );
+      mediaBody = mediaUploadResponse.data;
+    }
+
+    await projectCreateMutation.mutateAsync(
+      projectCreateSchema.parse({ ...data, ...mediaBody }),
+      {
+        onSuccess: ({ data }) =>
+          navigate({
+            to: "/projects/$id",
+            params: { id: String(data.id) },
+            ignoreBlocker: true,
+          }),
+      },
+    );
   };
 
   return (
@@ -51,7 +82,7 @@ function RouteComponent() {
       <Stack sx={{ my: 2 }}>
         <Card>
           <CardContent>
-            <ProjectForm onSubmit={handleCreateProject} />
+            <ProjectForm onSubmit={handleCreateProject} onCancel={handleBack} />
           </CardContent>
         </Card>
       </Stack>
