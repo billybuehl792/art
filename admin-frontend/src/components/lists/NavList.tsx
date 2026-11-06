@@ -36,12 +36,12 @@ const NavList: React.FC<NavListProps> = ({
       <List {...slotProps?.list}>
         <ListItemButtonLink to="/" {...buttonProps}>
           <ListItemIcon children={<HomeIcon />} />
-          <ListItemText primary="home" />
+          <ListItemText primary="Home" />
         </ListItemButtonLink>
 
         <ListItemButtonLink to="/projects" {...buttonProps}>
           <ListItemIcon children={<ProjectIcon />} />
-          <ListItemText primary="projects" />
+          <ListItemText primary="Projects" />
         </ListItemButtonLink>
       </List>
     </Stack>

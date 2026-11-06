@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -37,13 +37,15 @@ function RouteComponent() {
 
   const navigate = Route.useNavigate();
   const project = Route.useLoaderData();
+  const queryClient = useQueryClient();
   const confirm = useConfirm();
 
   /** Mutations */
 
-  const projectDeleteMutation = useMutation(
-    queries.projects.project(project.id).delete(),
-  );
+  const projectDeleteMutation = useMutation({
+    ...queries.projects.project(project.id).delete(),
+    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+  });
 
   /** Callbacks */
 
@@ -88,6 +90,7 @@ function RouteComponent() {
       <PageHeader
         title={
           <Breadcrumbs sx={{ flexGrow: 1 }}>
+            <Link to="/">Home</Link>
             <Link to="/projects">Projects</Link>
             <Typography>{project.title}</Typography>
           </Breadcrumbs>

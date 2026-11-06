@@ -3,7 +3,7 @@ import {
   useCanGoBack,
   useRouter,
 } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -29,12 +29,16 @@ function RouteComponent() {
 
   const router = useRouter();
   const navigate = Route.useNavigate();
+  const queryClient = useQueryClient();
   const canGoBack = useCanGoBack();
 
   /** Mutations */
 
-  const projectCreateMutation = useMutation(queries.projects.post());
   const uploadCreateMutation = useMutation(queries.uploads.post());
+  const projectCreateMutation = useMutation({
+    ...queries.projects.post(),
+    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+  });
 
   /** Callbacks */
 
@@ -74,6 +78,7 @@ function RouteComponent() {
       <PageHeader
         title={
           <Breadcrumbs>
+            <Link to="/">Home</Link>
             <Link to="/projects">Projects</Link>
             <Typography>Create</Typography>
           </Breadcrumbs>

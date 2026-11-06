@@ -42,8 +42,20 @@ export const getProjects = async (params: ProjectListRequestParams) => {
     conditions.push(`category = $${values.length}`);
   }
 
+  if (params.search) {
+    values.push(`%${params.search.trim()}%`);
+    conditions.push(`
+      (
+        title ILIKE $${values.length}
+        OR subtitle ILIKE $${values.length}
+        OR description ILIKE $${values.length}
+      )
+    `);
+  }
+
   const where =
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const orderBy = "ORDER BY sort_order ASC, created_at DESC";
   const limit = `LIMIT $${values.length + 1}`;
   const offset = `OFFSET $${values.length + 2}`;
@@ -66,6 +78,17 @@ export const getProjectsCount = async (params: ProjectListRequestParams) => {
   if (params.category) {
     values.push(params.category);
     conditions.push(`category = $${values.length}`);
+  }
+
+  if (params.search) {
+    values.push(`%${params.search.trim()}%`);
+    conditions.push(`
+      (
+        title ILIKE $${values.length}
+        OR subtitle ILIKE $${values.length}
+        OR description ILIKE $${values.length}
+      )
+    `);
   }
 
   const where =

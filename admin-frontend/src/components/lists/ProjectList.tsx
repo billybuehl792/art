@@ -6,7 +6,6 @@ import ProjectListCard, {
   type ProjectListCardProps,
 } from "../cards/ProjectListCard";
 import type { MenuOption, Project } from "@/types";
-import { DEFAULT_LIMIT } from "@/constants";
 
 export interface ProjectListProps extends StackProps {
   projects: Project[];
@@ -95,7 +94,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         {renderSkeletonCard("infinite-scroll")}
       </InfiniteScrollTrigger>
       {(!!loading || isFetchingNextPage) &&
-        Array.from({ length: DEFAULT_LIMIT - 1 }).map((_, index) =>
+        Array.from({ length: 20 }).map((_, index) =>
           renderSkeletonCard(`skeleton-${index}`),
         )}
     </Stack>

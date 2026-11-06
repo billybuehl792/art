@@ -1,33 +1,57 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  stripSearchParams,
+  useNavigate,
+} from "@tanstack/react-router";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Breadcrumbs, Container, Typography } from "@mui/material";
-import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
-import Link from "@/components/links/Link";
+import {
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
+import { useConfirm } from "@/providers/ConfirmProvider";
+import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
 import ProjectList, {
   type ProjectListProps,
 } from "@/components/lists/ProjectList";
 import PageHeader from "@/components/layout/PageHeader";
+import SearchField from "@/components/fields/SearchField";
 import queries from "@/queries";
-import { useConfirm } from "@/providers/ConfirmProvider";
-import type { Project } from "@/types";
+import type { MenuOption, Project } from "@/types";
+import { projectListRequestParamsSchema } from "@/schemas";
+import Link from "@/components/links/Link";
 
 export const Route = createFileRoute("/_app/projects/")({
   component: RouteComponent,
+  validateSearch: projectListRequestParamsSchema,
+  search: { middlewares: [stripSearchParams({ search: undefined })] },
 });
 
 function RouteComponent() {
   /** Values */
 
   const navigate = useNavigate({ from: Route.fullPath });
+  const searchParams = Route.useSearch();
+  const queryClient = useQueryClient();
   const confirm = useConfirm();
 
   /** Queries */
 
-  const projectListQuery = useInfiniteQuery(queries.projects.get());
+  const projectListQuery = useInfiniteQuery(
+    queries.projects.get(projectListRequestParamsSchema.parse(searchParams)),
+  );
 
   /** Mutations */
 
-  const projectDeleteMutation = useMutation(queries.projects.delete());
+  const projectDeleteMutation = useMutation({
+    ...queries.projects.delete(),
+    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+  });
 
   /** Data */
 
@@ -41,6 +65,9 @@ function RouteComponent() {
 
   /** Callbacks */
 
+  const handleOnSearch = (search: string) =>
+    navigate({ to: ".", search: { search } });
+
   const handleDeleteProject = async (project: Project) => {
     const confirmed = await confirm({
       title: "Delete project?",
@@ -50,10 +77,19 @@ function RouteComponent() {
 
     if (!confirmed) return;
 
-    await projectDeleteMutation.mutateAsync(project.id, {
-      onSuccess: () => projectListQuery.refetch(),
-    });
+    await projectDeleteMutation.mutateAsync(project.id);
   };
+
+  /** Options */
+
+  const options: MenuOption[] = [
+    {
+      id: "create",
+      title: "Create",
+      Icon: AddIcon,
+      onClick: () => navigate({ to: "/projects/create" }),
+    },
+  ];
 
   const getProjectOptions: ProjectListProps["projectOptions"] = (project) => [
     {
@@ -76,11 +112,18 @@ function RouteComponent() {
     <Container>
       <PageHeader
         title={
-          <Breadcrumbs sx={{ flexGrow: 1 }}>
+          <Breadcrumbs>
+            <Link to="/">Home</Link>
             <Typography>Projects</Typography>
           </Breadcrumbs>
         }
-        endContent={<Link to="/projects/create">Create</Link>}
+        endContent={<MenuOptionsIconButton options={options} />}
+        bottomContent={
+          <SearchField
+            value={searchParams.search || ""}
+            onChange={handleOnSearch}
+          />
+        }
       />
       <ProjectList
         projects={projects}

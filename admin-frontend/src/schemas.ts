@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { DEFAULT_LIMIT } from "@/constants";
 
 /** Basic */
 
@@ -11,8 +10,8 @@ export const loginSchema = z.object({
 });
 
 export const listRequestParamsSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(DEFAULT_LIMIT),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export function listResponseSchema<T extends z.ZodType>(itemSchema: T) {
@@ -75,7 +74,12 @@ export const projectUpdateSchema = z
   });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
-  category: projectCategoryEnum.optional(),
+  search: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || undefined),
+  category: projectCategoryEnum.optional().transform((v) => v || undefined),
 });
 
 export const projectListResponseSchema = listResponseSchema(projectSchema);

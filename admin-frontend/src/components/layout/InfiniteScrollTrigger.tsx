@@ -31,7 +31,9 @@ const InfiniteScrollTrigger: React.FC<InfiniteScrollTriggerProps> = ({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  return hasNextPage ? <div ref={ref}>{children}</div> : null;
+  return hasNextPage && !isFetchingNextPage ? (
+    <div ref={ref}>{children}</div>
+  ) : null;
 };
 
 export default InfiniteScrollTrigger;

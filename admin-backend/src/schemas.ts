@@ -84,6 +84,7 @@ export const projectUpdateSchema = z
   });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
+  search: z.string().trim().optional(),
   category: projectCategoryEnum.nullable().optional(),
 });
 

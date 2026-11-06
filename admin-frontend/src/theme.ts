@@ -11,7 +11,6 @@ declare module "@mui/material/styles" {
       appBarHeight: number;
       navPanelWidth: number;
       footerHeight: number;
-      pageHeaderHeight: number;
     };
   }
   interface ThemeOptions {
@@ -19,7 +18,6 @@ declare module "@mui/material/styles" {
       appBarHeight: number;
       navPanelWidth?: number;
       footerHeight?: number;
-      pageHeaderHeight?: number;
     };
   }
 }
@@ -54,7 +52,6 @@ export const createAppTheme = () =>
       appBarHeight: 60,
       navPanelWidth: 200,
       footerHeight: 32,
-      pageHeaderHeight: 60,
     },
     typography: {
       fontFamily: "Raleway, sans-serif",

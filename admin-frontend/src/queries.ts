@@ -12,18 +12,12 @@ const queries = {
     get: () =>
       queryOptions({ queryKey: ["health"], queryFn: endpoints.health.get }),
   },
-  auth: {
-    post: () =>
-      mutationOptions({
-        mutationKey: ["auth", "post"],
-        mutationFn: endpoints.auth.post,
-      }),
-  },
   projects: {
     get: (params?: ProjectListRequestParams) =>
       infiniteQueryOptions({
         queryKey: ["projects", params],
         initialPageParam: 1,
+        staleTime: 5 * 60 * 1000, // 5 minutes
         queryFn: ({ pageParam: page }) =>
           endpoints.projects.get(
             projectListRequestParamsSchema.parse({ ...params, page }),

@@ -4,7 +4,7 @@ import {
   useCanGoBack,
   useRouter,
 } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -32,18 +32,18 @@ export const Route = createFileRoute("/_app/projects/$id/edit")({
     const idParse = idSchema.safeParse(params.id);
     if (!idParse.success) throw notFound();
 
-    const { data } = await context.queryClient.query(
+    const { data: project } = await context.queryClient.query(
       queries.projects.project(idParse.data).get(),
     );
 
     let media: File | null = null;
     try {
-      media = data.mediaUrl ? await urlToFile(data.mediaUrl) : null;
+      media = project.mediaUrl ? await urlToFile(project.mediaUrl) : null;
     } catch (error) {
       console.error("Failed to fetch media or thumbnail:", error);
     }
 
-    return { ...data, media };
+    return { project: { ...project, media } };
   },
 });
 
@@ -52,19 +52,24 @@ function RouteComponent() {
 
   const router = useRouter();
   const navigate = Route.useNavigate();
-  const project = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  const queryClient = useQueryClient();
   const canGoBack = useCanGoBack();
   const confirm = useConfirm();
 
+  const project = loaderData.project;
+
   /** Mutations */
 
-  const projectUpdateMutation = useMutation(
-    queries.projects.project(project.id).patch(),
-  );
-  const projectDeleteMutation = useMutation(
-    queries.projects.project(project.id).delete(),
-  );
   const uploadCreateMutation = useMutation(queries.uploads.post());
+  const projectUpdateMutation = useMutation({
+    ...queries.projects.project(project.id).patch(),
+    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+  });
+  const projectDeleteMutation = useMutation({
+    ...queries.projects.project(project.id).delete(),
+    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+  });
 
   /** Callbacks */
 
@@ -82,7 +87,8 @@ function RouteComponent() {
     if (media === null) {
       mediaBody = { mediaType: null, mediaUrl: null, thumbnailUrl: null };
     } else {
-      const isSameMediaFile = project.media && isSameFile(media, project.media);
+      const isSameMediaFile =
+        !!project.media && !!media && isSameFile(media, project.media);
       if (!isSameMediaFile) {
         const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
           uploadCreateSchema.parse({ file: media }),
@@ -135,6 +141,7 @@ function RouteComponent() {
       <PageHeader
         title={
           <Breadcrumbs sx={{ flexGrow: 1 }}>
+            <Link to="/">Home</Link>
             <Link to="/projects">Projects</Link>
             <Link to="/projects/$id" params={{ id: String(project.id) }}>
               {project.title}

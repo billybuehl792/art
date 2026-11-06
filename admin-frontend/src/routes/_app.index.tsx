@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_app/")({
 function RouteComponent() {
   return (
     <Container>
-      <PageHeader title="Admin Configuration" />
+      <PageHeader title={<Typography>Home</Typography>} />
       <Grid container spacing={2} sx={{ my: 2 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card>
