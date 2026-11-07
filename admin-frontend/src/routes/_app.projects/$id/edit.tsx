@@ -21,10 +21,14 @@ import ProjectForm, {
   type ProjectFormProps,
 } from "@/components/forms/ProjectForm";
 import { useConfirm } from "@/providers/ConfirmProvider";
-import queries from "@/queries";
-import { idSchema, projectUpdateSchema, uploadCreateSchema } from "@/schemas";
-import { isSameFile, urlToFile } from "@/utils";
-import type { MenuOption } from "@/types";
+import { idSchema } from "@/schemas/basic";
+import { uploadCreateSchema } from "@/schemas/uploads";
+import { projectUpdateSchema } from "@/schemas/projects";
+import { isSameFile, urlToFile } from "@/utils/files";
+import type { MenuOption } from "@/types/basic";
+import { projectQueries } from "@/queries/projects";
+import { PROJECTS_KEY } from "@/constants/projects";
+import { uploadQueries } from "@/queries/uploads";
 
 export const Route = createFileRoute("/_app/projects/$id/edit")({
   component: RouteComponent,
@@ -33,7 +37,7 @@ export const Route = createFileRoute("/_app/projects/$id/edit")({
     if (!idParse.success) throw notFound();
 
     const { data: project } = await context.queryClient.query(
-      queries.projects.project(idParse.data).get(),
+      projectQueries.projects.project(idParse.data).get(),
     );
 
     let media: File | null = null;
@@ -61,14 +65,14 @@ function RouteComponent() {
 
   /** Mutations */
 
-  const uploadCreateMutation = useMutation(queries.uploads.post());
+  const uploadCreateMutation = useMutation(uploadQueries.uploads.post());
   const projectUpdateMutation = useMutation({
-    ...queries.projects.project(project.id).patch(),
-    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+    ...projectQueries.projects.project(project.id).patch(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
   const projectDeleteMutation = useMutation({
-    ...queries.projects.project(project.id).delete(),
-    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+    ...projectQueries.projects.project(project.id).delete(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
 
   /** Callbacks */

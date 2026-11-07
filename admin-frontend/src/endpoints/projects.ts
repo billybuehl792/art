@@ -1,18 +1,13 @@
 import apiClient from "@/api";
 import type {
-  Login,
   Project,
   ProjectCreate,
   ProjectListRequestParams,
   ProjectListResponse,
   ProjectUpdate,
-  UploadCreate,
-  UploadResponse,
-} from "./types";
+} from "@/types/projects";
 
-const endpoints = {
-  health: { get: () => apiClient.get<{ status: string }>("/health") },
-  auth: { post: async (_body: Login) => {} },
+export const projectEndpoints = {
   projects: {
     get: (params?: ProjectListRequestParams) =>
       apiClient.get<ProjectListResponse>("/projects", { params }),
@@ -24,14 +19,4 @@ const endpoints = {
       delete: () => apiClient.delete<void>(`/projects/${id}`),
     }),
   },
-  uploads: {
-    post: (body: UploadCreate) => {
-      const formData = new FormData();
-      formData.append("file", body.file);
-      return apiClient.post<UploadResponse>("/uploads", formData);
-    },
-    delete: (filename: string) => apiClient.delete<void>(`/uploads${filename}`),
-  },
 };
-
-export default endpoints;

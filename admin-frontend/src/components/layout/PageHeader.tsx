@@ -6,7 +6,7 @@ import {
   type StackProps,
   type TypographyProps,
 } from "@mui/material";
-import { sxArray, truncateText } from "@/utils";
+import { sxArray, truncateText } from "@/utils/sx";
 
 interface PageHeaderProps extends Omit<StackProps, "title"> {
   title: ReactNode;

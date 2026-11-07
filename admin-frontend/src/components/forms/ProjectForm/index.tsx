@@ -1,4 +1,5 @@
 import React from "react";
+import { useBlocker } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import {
@@ -10,9 +11,8 @@ import {
   type BoxProps,
 } from "@mui/material";
 import FileUploadField from "@/components/fields/FileUploadField";
-import { projectCategoryEnum } from "@/schemas";
-import { useBlocker } from "@tanstack/react-router";
 import { useConfirm } from "@/providers/ConfirmProvider";
+import { projectCategoryEnum } from "@/schemas/projects";
 
 const projectFormSchema = z.object({
   title: z.string().trim().min(1),

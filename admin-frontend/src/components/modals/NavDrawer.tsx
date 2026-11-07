@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import NavList from "../lists/NavList";
-import { truncateText } from "@/utils";
-import { APP_TITLE } from "@/constants";
+import { truncateText } from "@/utils/sx";
+import { APP_TITLE } from "@/constants/basic";
 
 const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
   /** Callbacks */

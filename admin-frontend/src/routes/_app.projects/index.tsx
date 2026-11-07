@@ -9,22 +9,18 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Breadcrumbs, Container, Typography } from "@mui/material";
-import {
-  Delete as DeleteIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-} from "@mui/icons-material";
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { useConfirm } from "@/providers/ConfirmProvider";
-import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
+import Link from "@/components/links/Link";
 import ProjectList, {
   type ProjectListProps,
 } from "@/components/lists/ProjectList";
 import PageHeader from "@/components/layout/PageHeader";
 import SearchField from "@/components/fields/SearchField";
-import queries from "@/queries";
-import type { MenuOption, Project } from "@/types";
-import { projectListRequestParamsSchema } from "@/schemas";
-import Link from "@/components/links/Link";
+import { projectQueries } from "@/queries/projects";
+import { projectListRequestParamsSchema } from "@/schemas/projects";
+import { PROJECTS_KEY } from "@/constants/projects";
+import type { Project } from "@/types/projects";
 
 export const Route = createFileRoute("/_app/projects/")({
   component: RouteComponent,
@@ -43,14 +39,16 @@ function RouteComponent() {
   /** Queries */
 
   const projectListQuery = useInfiniteQuery(
-    queries.projects.get(projectListRequestParamsSchema.parse(searchParams)),
+    projectQueries.projects.get(
+      projectListRequestParamsSchema.parse(searchParams),
+    ),
   );
 
   /** Mutations */
 
   const projectDeleteMutation = useMutation({
-    ...queries.projects.delete(),
-    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+    ...projectQueries.projects.delete(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
 
   /** Data */
@@ -82,15 +80,6 @@ function RouteComponent() {
 
   /** Options */
 
-  const options: MenuOption[] = [
-    {
-      id: "create",
-      title: "Create",
-      Icon: AddIcon,
-      onClick: () => navigate({ to: "/projects/create" }),
-    },
-  ];
-
   const getProjectOptions: ProjectListProps["projectOptions"] = (project) => [
     {
       id: "edit",
@@ -117,7 +106,7 @@ function RouteComponent() {
             <Typography>Projects</Typography>
           </Breadcrumbs>
         }
-        endContent={<MenuOptionsIconButton options={options} />}
+        endContent={<Link to="/projects/create">Create</Link>}
         bottomContent={
           <SearchField
             value={searchParams.search || ""}

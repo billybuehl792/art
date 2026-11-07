@@ -11,12 +11,13 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import Link from "@/components/links/Link";
+import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
 import PageHeader from "@/components/layout/PageHeader";
 import { useConfirm } from "@/providers/ConfirmProvider";
-import queries from "@/queries";
-import { idSchema } from "@/schemas";
-import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
-import type { MenuOption } from "@/types";
+import { projectQueries } from "@/queries/projects";
+import { idSchema } from "@/schemas/basic";
+import type { MenuOption } from "@/types/basic";
+import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/projects/$id/")({
   loader: async ({ params, context }) => {
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/_app/projects/$id/")({
     if (!idParse.success) throw notFound();
 
     const { data } = await context.queryClient.query(
-      queries.projects.project(idParse.data).get(),
+      projectQueries.projects.project(idParse.data).get(),
     );
 
     return data;
@@ -43,8 +44,8 @@ function RouteComponent() {
   /** Mutations */
 
   const projectDeleteMutation = useMutation({
-    ...queries.projects.project(project.id).delete(),
-    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+    ...projectQueries.projects.project(project.id).delete(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
 
   /** Callbacks */

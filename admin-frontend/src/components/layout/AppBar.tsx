@@ -13,8 +13,8 @@ import {
 } from "@mui/icons-material";
 import NavDrawer from "../modals/NavDrawer";
 import Link from "../links/Link";
-import { truncateText } from "@/utils";
-import { APP_TITLE } from "@/constants";
+import { truncateText } from "@/utils/sx";
+import { APP_TITLE } from "@/constants/basic";
 
 const StyledStack = styled(Stack)(({ theme }) => ({
   position: "fixed",

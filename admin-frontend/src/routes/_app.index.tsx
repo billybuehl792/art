@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import PageHeader from "@/components/layout/PageHeader";
 import CardActionAreaLink from "@/components/links/CardActionAreaLink";
-import { ProjectIcon } from "@/constants";
-import { truncateText } from "@/utils";
+import { ProjectIcon } from "@/constants/projects";
+import { truncateText } from "@/utils/sx";
 
 export const Route = createFileRoute("/_app/")({
   component: RouteComponent,

@@ -8,8 +8,9 @@ import {
   type CardProps,
 } from "@mui/material";
 import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
-import { sxArray, truncateText } from "@/utils";
-import type { MenuOption, Project } from "@/types";
+import { sxArray, truncateText } from "@/utils/sx";
+import type { MenuOption } from "@/types/basic";
+import type { Project } from "@/types/projects";
 
 export interface ProjectListCardProps extends Omit<CardProps, "onClick"> {
   project: Project;

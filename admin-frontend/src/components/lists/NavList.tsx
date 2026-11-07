@@ -9,7 +9,8 @@ import {
   type StackProps,
 } from "@mui/material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
-import { HomeIcon, ProjectIcon } from "@/constants";
+import { HomeIcon } from "@/constants/basic";
+import { ProjectIcon } from "@/constants/projects";
 
 interface NavListProps extends StackProps {
   onNavigate?: VoidFunction;

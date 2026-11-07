@@ -1,41 +1,7 @@
-import path from "path";
 import { z } from "zod";
+import { idSchema, listRequestParamsSchema, listResponseSchema } from "./basic";
 
-export const idSchema = z.coerce.number().int().positive();
-
-export const filenameSchema = z
-  .string()
-  .min(1)
-  .refine((filename) => filename === path.basename(filename), {
-    message: "Invalid filename",
-  });
-
-/** Auth */
-
-export const authRequestSchema = z.object({
-  username: z.string().trim().min(1),
-  password: z.string().trim().min(1),
-});
-
-/** Lists */
-
-export const listRequestParamsSchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-});
-
-export function listResponseSchema<T extends z.ZodType>(itemSchema: T) {
-  return z.object({
-    page: z.number().int().min(1),
-    limit: z.number().int().min(1),
-    total: z.number().int().min(0),
-    results: z.array(itemSchema),
-  });
-}
-
-/** Projects */
-
-const projectCategoryEnum = z.enum(["art", "dev"]);
+export const projectCategoryEnum = z.enum(["art", "dev"]);
 
 export const projectSchema = z.object({
   id: idSchema,
@@ -47,8 +13,8 @@ export const projectSchema = z.object({
   mediaType: z.string().nullable(),
   mediaUrl: z.string().nullable(),
   thumbnailUrl: z.string().nullable(),
-  priority: z.coerce.number(),
-  sortOrder: z.number(),
+  priority: z.number().nonnegative(),
+  sortOrder: z.number().nonnegative(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -84,16 +50,12 @@ export const projectUpdateSchema = z
   });
 
 export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
-  search: z.string().trim().optional(),
-  category: projectCategoryEnum.nullable().optional(),
+  search: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || undefined),
+  category: projectCategoryEnum.optional().transform((v) => v || undefined),
 });
 
 export const projectListResponseSchema = listResponseSchema(projectSchema);
-
-/** Upload */
-
-export const uploadResponseSchema = z.object({
-  mediaType: z.string(),
-  mediaUrl: z.string(),
-  thumbnailUrl: z.string(),
-});

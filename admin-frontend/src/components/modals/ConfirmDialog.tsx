@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { truncateText } from "@/utils";
+import { truncateText } from "@/utils/sx";
 
 export interface ConfirmOptions {
   title?: ReactNode;

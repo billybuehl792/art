@@ -13,7 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { routeTree } from "./routeTree.gen";
-import { createAppTheme } from "./theme";
+import { createAppTheme } from "./config/theme";
 import LoadingScreen from "./components/layout/LoadingScreen";
 import ErrorScreen from "./components/layout/ErrorScreen";
 import ConfirmProvider from "./providers/ConfirmProvider";

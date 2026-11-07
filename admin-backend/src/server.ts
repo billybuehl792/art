@@ -3,7 +3,7 @@ import "dotenv/config";
 import app from "./app";
 import fs from "node:fs/promises";
 import { testDatabaseConnection } from "./db";
-import { UPLOAD_THUMBNAIL_DIR, UPLOAD_DIR } from "./constants";
+import { UPLOAD_DIR, UPLOAD_THUMBNAIL_DIR } from "./constants/uploads";
 
 const start = async () => {
   if (!process.env.ADMIN_API_KEY)

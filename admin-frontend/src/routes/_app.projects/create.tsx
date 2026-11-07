@@ -17,8 +17,11 @@ import ProjectForm, {
 } from "@/components/forms/ProjectForm";
 import PageHeader from "@/components/layout/PageHeader";
 import Link from "@/components/links/Link";
-import queries from "@/queries";
-import { projectCreateSchema, uploadCreateSchema } from "@/schemas";
+import { projectQueries } from "@/queries/projects";
+import { uploadQueries } from "@/queries/uploads";
+import { uploadCreateSchema } from "@/schemas/uploads";
+import { projectCreateSchema } from "@/schemas/projects";
+import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/projects/create")({
   component: RouteComponent,
@@ -34,10 +37,10 @@ function RouteComponent() {
 
   /** Mutations */
 
-  const uploadCreateMutation = useMutation(queries.uploads.post());
+  const uploadCreateMutation = useMutation(uploadQueries.uploads.post());
   const projectCreateMutation = useMutation({
-    ...queries.projects.post(),
-    onSuccess: () => queryClient.invalidateQueries(queries.projects.get()),
+    ...projectQueries.projects.post(),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
 
   /** Callbacks */

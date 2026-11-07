@@ -8,7 +8,7 @@ import {
   type IconButtonProps,
 } from "@mui/material";
 import { MoreVert as MoreVertIcon } from "@mui/icons-material";
-import type { MenuOption } from "@/types";
+import type { MenuOption } from "@/types/basic";
 
 interface MenuOptionsIconButtonProps extends IconButtonProps {
   options: MenuOption[];

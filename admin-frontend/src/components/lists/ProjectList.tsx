@@ -5,7 +5,8 @@ import StatusCard from "@/components/cards/StatusCard";
 import ProjectListCard, {
   type ProjectListCardProps,
 } from "../cards/ProjectListCard";
-import type { MenuOption, Project } from "@/types";
+import type { MenuOption } from "@/types/basic";
+import type { Project } from "@/types/projects";
 
 export interface ProjectListProps extends StackProps {
   projects: Project[];
