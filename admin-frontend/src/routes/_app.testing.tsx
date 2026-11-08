@@ -1,23 +1,79 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Breadcrumbs, Container, Typography } from "@mui/material";
-import SortableList from "@/components/lists/SortableList";
+import SortableList, {
+  type SortableListProps,
+} from "@/components/lists/SortableList";
 import PageHeader from "@/components/layout/PageHeader";
 import Link from "@/components/links/Link";
-import { getMockProject } from "@/mocks/projects";
-import type { Project } from "@/types/projects";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { projectQueries } from "@/queries/projects";
+import { reorderInfiniteData } from "@/utils/queries";
+import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/testing")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [items, setItems] = useState<Project[]>([
-    getMockProject({ id: 1 }),
-    getMockProject({ id: 2 }),
-    getMockProject({ id: 3 }),
-    getMockProject({ id: 4 }),
-  ]);
+  /** Values */
+
+  const queryClient = useQueryClient();
+
+  /** Queries */
+
+  const projectListQueryOptions = projectQueries.projects.get();
+  const projectListQuery = useInfiniteQuery(projectListQueryOptions);
+
+  /** Mutations */
+
+  const projectListReorderMutation = useMutation({
+    ...projectQueries.projects.reorder(),
+    onMutate: async (_body, { client }) => {
+      await client.cancelQueries(projectListQueryOptions);
+
+      const previousData = client.getQueryData(
+        projectListQueryOptions.queryKey,
+      );
+
+      return { previousData };
+    },
+    onError: (_error, _variables, queryContext, { client }) => {
+      if (queryContext?.previousData)
+        client.setQueryData(
+          projectListQueryOptions.queryKey,
+          queryContext.previousData,
+        );
+    },
+    onSettled: (_, __, ___, ____, { client }) =>
+      client.invalidateQueries({ queryKey: PROJECTS_KEY }),
+  });
+  /** Data */
+
+  const projects =
+    projectListQuery.data?.pages.flatMap((page) => page.data.results) ?? [];
+
+  /** Callbacks */
+
+  const handleOnSort: SortableListProps["onSort"] = (
+    sortedProjects,
+    targetId,
+  ) => {
+    if (!projectListQuery.data) return;
+
+    queryClient.setQueryData(
+      projectListQueryOptions.queryKey,
+      reorderInfiniteData(projectListQuery.data, sortedProjects),
+    );
+
+    const movedIndex = sortedProjects.findIndex((item) => item.id === targetId);
+    const afterId = movedIndex > 0 ? sortedProjects[movedIndex - 1].id : null;
+
+    projectListReorderMutation.mutate({ targetId, afterId });
+  };
 
   return (
     <Container>
@@ -29,7 +85,14 @@ function RouteComponent() {
           </Breadcrumbs>
         }
       />
-      <SortableList items={items} onSort={setItems} />
+      <SortableList
+        items={projects}
+        disabled={projectListQuery.isFetching}
+        hasNextPage={projectListQuery.hasNextPage}
+        isFetchingNextPage={projectListQuery.isFetchingNextPage}
+        fetchNextPage={projectListQuery.fetchNextPage}
+        onSort={handleOnSort}
+      />
     </Container>
   );
 }

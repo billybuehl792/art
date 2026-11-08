@@ -37,10 +37,9 @@ function RouteComponent() {
 
   /** Queries */
 
-  const projectListQueryOptions = projectQueries.projects.get(
-    projectListRequestSchema.parse({ params }),
+  const projectListQuery = useInfiniteQuery(
+    projectQueries.projects.get(projectListRequestSchema.parse({ params })),
   );
-  const projectListQuery = useInfiniteQuery(projectListQueryOptions);
 
   /** Mutations */
 
