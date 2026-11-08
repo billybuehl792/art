@@ -3,7 +3,7 @@ import {
   useCanGoBack,
   useRouter,
 } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -21,7 +21,6 @@ import { projectQueries } from "@/queries/projects";
 import { uploadQueries } from "@/queries/uploads";
 import { uploadCreateSchema } from "@/schemas/uploads";
 import { projectCreateSchema } from "@/schemas/projects";
-import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/projects/create")({
   component: RouteComponent,
@@ -32,16 +31,12 @@ function RouteComponent() {
 
   const router = useRouter();
   const navigate = Route.useNavigate();
-  const queryClient = useQueryClient();
   const canGoBack = useCanGoBack();
 
   /** Mutations */
 
   const uploadCreateMutation = useMutation(uploadQueries.uploads.post());
-  const projectCreateMutation = useMutation({
-    ...projectQueries.projects.post(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
-  });
+  const projectCreateMutation = useMutation(projectQueries.projects.post());
 
   /** Callbacks */
 

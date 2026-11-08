@@ -3,11 +3,7 @@ import {
   stripSearchParams,
   useNavigate,
 } from "@tanstack/react-router";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { Breadcrumbs, Container, Typography } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { useConfirm } from "@/providers/ConfirmProvider";
@@ -17,7 +13,6 @@ import PageHeader from "@/components/layout/PageHeader";
 import SearchField from "@/components/fields/SearchField";
 import { projectQueries } from "@/queries/projects";
 import { projectListRequestSchema } from "@/schemas/projects";
-import { PROJECTS_KEY } from "@/constants/projects";
 import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
 
@@ -32,7 +27,6 @@ function RouteComponent() {
 
   const navigate = useNavigate({ from: Route.fullPath });
   const params = Route.useSearch();
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
 
   /** Queries */
@@ -43,10 +37,7 @@ function RouteComponent() {
 
   /** Mutations */
 
-  const projectDeleteMutation = useMutation({
-    ...projectQueries.projects.delete(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
-  });
+  const projectDeleteMutation = useMutation(projectQueries.projects.delete());
 
   /** Data */
 

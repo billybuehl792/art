@@ -4,7 +4,7 @@ import {
   useCanGoBack,
   useRouter,
 } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -25,10 +25,9 @@ import { idSchema } from "@/schemas/basic";
 import { uploadCreateSchema } from "@/schemas/uploads";
 import { projectUpdateSchema } from "@/schemas/projects";
 import { isSameFile, urlToFile } from "@/utils/files";
-import type { MenuOption } from "@/types/basic";
 import { projectQueries } from "@/queries/projects";
-import { PROJECTS_KEY } from "@/constants/projects";
 import { uploadQueries } from "@/queries/uploads";
+import type { MenuOption } from "@/types/basic";
 
 export const Route = createFileRoute("/_app/projects/$id/edit")({
   component: RouteComponent,
@@ -57,7 +56,6 @@ function RouteComponent() {
   const router = useRouter();
   const navigate = Route.useNavigate();
   const loaderData = Route.useLoaderData();
-  const queryClient = useQueryClient();
   const canGoBack = useCanGoBack();
   const confirm = useConfirm();
 
@@ -66,14 +64,12 @@ function RouteComponent() {
   /** Mutations */
 
   const uploadCreateMutation = useMutation(uploadQueries.uploads.post());
-  const projectUpdateMutation = useMutation({
-    ...projectQueries.projects.project(project.id).patch(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
-  });
-  const projectDeleteMutation = useMutation({
-    ...projectQueries.projects.project(project.id).delete(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
-  });
+  const projectUpdateMutation = useMutation(
+    projectQueries.projects.project(project.id).patch(),
+  );
+  const projectDeleteMutation = useMutation(
+    projectQueries.projects.project(project.id).delete(),
+  );
 
   /** Callbacks */
 

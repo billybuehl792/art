@@ -34,12 +34,16 @@ export const projectQueries = {
       mutationOptions({
         mutationKey: [...PROJECTS_KEY, "post"],
         mutationFn: projectEndpoints.projects.post,
+        onSuccess: (_, __, ___, { client }) =>
+          client.invalidateQueries({ queryKey: PROJECTS_KEY }),
       }),
     delete: () =>
       mutationOptions({
         mutationKey: [...PROJECTS_KEY, "delete"],
         mutationFn: (id: Project["id"]) =>
           projectEndpoints.projects.project(id).delete(),
+        onSuccess: (_, __, ___, { client }) =>
+          client.invalidateQueries({ queryKey: PROJECTS_KEY }),
       }),
     project: (id: Project["id"]) => ({
       get: () =>
@@ -51,17 +55,23 @@ export const projectQueries = {
         mutationOptions({
           mutationKey: [...PROJECTS_KEY, "patch", id],
           mutationFn: projectEndpoints.projects.project(id).patch,
+          onSuccess: (_, __, ___, { client }) =>
+            client.invalidateQueries({ queryKey: PROJECTS_KEY }),
         }),
       delete: () =>
         mutationOptions({
           mutationKey: [...PROJECTS_KEY, "delete", id],
           mutationFn: projectEndpoints.projects.project(id).delete,
+          onSuccess: (_, __, ___, { client }) =>
+            client.invalidateQueries({ queryKey: PROJECTS_KEY }),
         }),
     }),
     reorder: () =>
       mutationOptions({
         mutationKey: [...PROJECTS_KEY, "reorder"],
         mutationFn: projectEndpoints.projects.reorder.patch,
+        onSettled: (_, __, ___, ____, { client }) =>
+          client.invalidateQueries({ queryKey: PROJECTS_KEY }),
       }),
   },
 };

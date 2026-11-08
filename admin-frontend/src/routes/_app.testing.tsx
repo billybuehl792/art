@@ -12,7 +12,6 @@ import {
 } from "@tanstack/react-query";
 import { projectQueries } from "@/queries/projects";
 import { reorderInfiniteData } from "@/utils/queries";
-import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/testing")({
   component: RouteComponent,
@@ -41,15 +40,13 @@ function RouteComponent() {
 
       return { previousData };
     },
-    onError: (_error, _variables, queryContext, { client }) => {
+    onError: (_, __, queryContext, { client }) => {
       if (queryContext?.previousData)
         client.setQueryData(
           projectListQueryOptions.queryKey,
           queryContext.previousData,
         );
     },
-    onSettled: (_, __, ___, ____, { client }) =>
-      client.invalidateQueries({ queryKey: PROJECTS_KEY }),
   });
   /** Data */
 

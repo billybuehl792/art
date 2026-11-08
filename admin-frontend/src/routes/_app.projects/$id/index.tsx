@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import {
   Breadcrumbs,
   Card,
@@ -17,7 +17,6 @@ import { useConfirm } from "@/providers/ConfirmProvider";
 import { projectQueries } from "@/queries/projects";
 import { idSchema } from "@/schemas/basic";
 import type { MenuOption } from "@/types/basic";
-import { PROJECTS_KEY } from "@/constants/projects";
 
 export const Route = createFileRoute("/_app/projects/$id/")({
   loader: async ({ params, context }) => {
@@ -38,15 +37,13 @@ function RouteComponent() {
 
   const navigate = Route.useNavigate();
   const project = Route.useLoaderData();
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
 
   /** Mutations */
 
-  const projectDeleteMutation = useMutation({
-    ...projectQueries.projects.project(project.id).delete(),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROJECTS_KEY }),
-  });
+  const projectDeleteMutation = useMutation(
+    projectQueries.projects.project(project.id).delete(),
+  );
 
   /** Callbacks */
 
