@@ -2,15 +2,16 @@ import apiClient from "@/api";
 import type {
   Project,
   ProjectCreate,
-  ProjectListRequestParams,
-  ProjectListResponse,
   ProjectUpdate,
+  ProjectListRequest,
+  ProjectListResponse,
+  ProjectListReorder,
 } from "@/types/projects";
 
 export const projectEndpoints = {
   projects: {
-    get: (params?: ProjectListRequestParams) =>
-      apiClient.get<ProjectListResponse>("/projects", { params }),
+    get: (body?: ProjectListRequest) =>
+      apiClient.get<ProjectListResponse>("/projects", body),
     post: (body: ProjectCreate) => apiClient.post<Project>("/projects", body),
     project: (id: Project["id"]) => ({
       get: () => apiClient.get<Project>(`/projects/${id}`),
@@ -18,5 +19,11 @@ export const projectEndpoints = {
         apiClient.patch<Project>(`/projects/${id}`, body),
       delete: () => apiClient.delete<void>(`/projects/${id}`),
     }),
+    reorder: {
+      patch: (body: ProjectListReorder) => {
+        throw new Error("not implemented ");
+        return apiClient.patch<void>(`/projects/reorder`, body);
+      },
+    },
   },
 };

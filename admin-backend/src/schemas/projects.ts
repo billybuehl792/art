@@ -32,21 +32,6 @@ export const projectCreateSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).optional().default(0),
 });
 
-export const projectColumnCreateSchema = projectCreateSchema.transform(
-  (data) => ({
-    title: data.title,
-    subtitle: data.subtitle,
-    description: data.description,
-    category: data.category,
-    link: data.link,
-    media_type: data.mediaType,
-    media_url: data.mediaUrl,
-    thumbnail_url: data.thumbnailUrl,
-    priority: data.priority,
-    sort_order: data.sortOrder,
-  }),
-);
-
 export const projectUpdateSchema = z
   .object({
     title: z.string().trim().min(1).optional(),
@@ -64,6 +49,41 @@ export const projectUpdateSchema = z
     message: "At least one field must be provided",
   });
 
+/** Lists */
+
+export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
+  search: z.string().trim().optional(),
+  category: projectCategoryEnum.nullable().optional(),
+});
+
+export const projectListResponseSchema = listResponseSchema(projectSchema);
+
+export const projectListReorderSchema = z
+  .object({
+    targetId: idSchema,
+    afterId: idSchema.nullable().optional(),
+  })
+  .refine(({ targetId, afterId }) => targetId !== afterId, {
+    message: "A project cannot be positioned after itself",
+  });
+
+/** DB */
+
+export const projectColumnCreateSchema = projectCreateSchema.transform(
+  (data) => ({
+    title: data.title,
+    subtitle: data.subtitle,
+    description: data.description,
+    category: data.category,
+    link: data.link,
+    media_type: data.mediaType,
+    media_url: data.mediaUrl,
+    thumbnail_url: data.thumbnailUrl,
+    priority: data.priority,
+    sort_order: data.sortOrder,
+  }),
+);
+
 export const projectColumnUpdateSchema = projectUpdateSchema.transform(
   (data) => ({
     ...(data.title !== undefined && { title: data.title }),
@@ -80,10 +100,3 @@ export const projectColumnUpdateSchema = projectUpdateSchema.transform(
     ...(data.sortOrder !== undefined && { sort_order: data.sortOrder }),
   }),
 );
-
-export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
-  search: z.string().trim().optional(),
-  category: projectCategoryEnum.nullable().optional(),
-});
-
-export const projectListResponseSchema = listResponseSchema(projectSchema);

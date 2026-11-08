@@ -7,6 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { BugReport as BugReportIcon } from "@mui/icons-material";
 import PageHeader from "@/components/layout/PageHeader";
 import CardActionAreaLink from "@/components/links/CardActionAreaLink";
 import { ProjectIcon } from "@/constants/projects";
@@ -33,6 +34,24 @@ function RouteComponent() {
                   <ProjectIcon fontSize="large" />
                   <Typography variant="h2" sx={truncateText}>
                     Projects
+                  </Typography>
+                </Stack>
+              </CardContent>
+            </CardActionAreaLink>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Card>
+            <CardActionAreaLink to="/testing">
+              <CardContent>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{ alignItems: "center" }}
+                >
+                  <BugReportIcon fontSize="large" />
+                  <Typography variant="h2" sx={truncateText}>
+                    Testing
                   </Typography>
                 </Stack>
               </CardContent>

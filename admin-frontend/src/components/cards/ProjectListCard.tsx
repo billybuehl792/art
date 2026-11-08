@@ -30,10 +30,10 @@ const ProjectListCard: React.FC<ProjectListCardProps> = ({
 
   const Content = (
     <CardContent>
-      <Typography variant="h2" gutterBottom sx={truncateText}>
+      <Typography variant="body2" sx={truncateText}>
         {project.title}
       </Typography>
-      {!!project.subtitle && (
+      {/* {!!project.subtitle && (
         <Typography variant="h4" gutterBottom sx={truncateText}>
           {project.subtitle}
         </Typography>
@@ -42,7 +42,7 @@ const ProjectListCard: React.FC<ProjectListCardProps> = ({
         <Typography component="p" variant="caption" sx={truncateText}>
           {project.description}
         </Typography>
-      )}
+      )} */}
     </CardContent>
   );
 
@@ -57,7 +57,11 @@ const ProjectListCard: React.FC<ProjectListCardProps> = ({
       )}
       {!!options?.length && (
         <CardActions sx={{ position: "absolute", right: 0, top: 0, bottom: 0 }}>
-          <MenuOptionsIconButton options={options} disabled={disabled} />
+          <MenuOptionsIconButton
+            options={options}
+            size="small"
+            disabled={disabled}
+          />
         </CardActions>
       )}
     </Card>

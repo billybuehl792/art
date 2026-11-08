@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppTestingRouteImport } from './routes/_app.testing'
 import { Route as AppProjectsIndexRouteImport } from './routes/_app.projects/index'
 import { Route as AppProjectsCreateRouteImport } from './routes/_app.projects/create'
 import { Route as AppProjectsIdIndexRouteImport } from './routes/_app.projects/$id/index'
@@ -23,6 +24,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTestingRoute = AppTestingRouteImport.update({
+  id: '/testing',
+  path: '/testing',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProjectsIndexRoute = AppProjectsIndexRouteImport.update({
@@ -48,12 +54,14 @@ const AppProjectsIdEditRoute = AppProjectsIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/testing': typeof AppTestingRoute
   '/projects/create': typeof AppProjectsCreateRoute
   '/projects/': typeof AppProjectsIndexRoute
   '/projects/$id/edit': typeof AppProjectsIdEditRoute
   '/projects/$id/': typeof AppProjectsIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/testing': typeof AppTestingRoute
   '/': typeof AppIndexRoute
   '/projects/create': typeof AppProjectsCreateRoute
   '/projects': typeof AppProjectsIndexRoute
@@ -63,6 +71,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/_app/testing': typeof AppTestingRoute
   '/_app/': typeof AppIndexRoute
   '/_app/projects/create': typeof AppProjectsCreateRoute
   '/_app/projects/': typeof AppProjectsIndexRoute
@@ -73,12 +82,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/testing'
     | '/projects/create'
     | '/projects/'
     | '/projects/$id/edit'
     | '/projects/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/testing'
     | '/'
     | '/projects/create'
     | '/projects'
@@ -87,6 +98,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/_app/testing'
     | '/_app/'
     | '/_app/projects/create'
     | '/_app/projects/'
@@ -112,6 +124,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/testing': {
+      id: '/_app/testing'
+      path: '/testing'
+      fullPath: '/testing'
+      preLoaderRoute: typeof AppTestingRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/projects/': {
@@ -146,6 +165,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppTestingRoute: typeof AppTestingRoute
   AppIndexRoute: typeof AppIndexRoute
   AppProjectsCreateRoute: typeof AppProjectsCreateRoute
   AppProjectsIndexRoute: typeof AppProjectsIndexRoute
@@ -154,6 +174,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppTestingRoute: AppTestingRoute,
   AppIndexRoute: AppIndexRoute,
   AppProjectsCreateRoute: AppProjectsCreateRoute,
   AppProjectsIndexRoute: AppProjectsIndexRoute,

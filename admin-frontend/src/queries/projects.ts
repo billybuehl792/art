@@ -4,20 +4,23 @@ import {
   queryOptions,
 } from "@tanstack/react-query";
 import { projectEndpoints } from "@/endpoints/projects";
-import { projectListRequestParamsSchema } from "@/schemas/projects";
+import { projectListRequestSchema } from "@/schemas/projects";
 import { PROJECTS_KEY } from "@/constants/projects";
-import type { Project, ProjectListRequestParams } from "@/types/projects";
+import type { Project, ProjectListRequest } from "@/types/projects";
 
 export const projectQueries = {
   projects: {
-    get: (params?: ProjectListRequestParams) =>
+    get: (body?: ProjectListRequest) =>
       infiniteQueryOptions({
-        queryKey: [...PROJECTS_KEY, params],
+        queryKey: [...PROJECTS_KEY, body],
         initialPageParam: 1,
         staleTime: 5 * 60 * 1000, // 5 minutes
         queryFn: ({ pageParam: page }) =>
           projectEndpoints.projects.get(
-            projectListRequestParamsSchema.parse({ ...params, page }),
+            projectListRequestSchema.parse({
+              ...body,
+              params: { ...body?.params, page },
+            }),
           ),
         getNextPageParam: (lastPage) => {
           const nextPage = lastPage.data.page + 1;
@@ -55,5 +58,10 @@ export const projectQueries = {
           mutationFn: projectEndpoints.projects.project(id).delete,
         }),
     }),
+    reorder: () =>
+      mutationOptions({
+        mutationKey: [...PROJECTS_KEY, "reorder"],
+        mutationFn: projectEndpoints.projects.reorder.patch,
+      }),
   },
 };

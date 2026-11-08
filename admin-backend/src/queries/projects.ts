@@ -7,16 +7,21 @@ import {
 import type { Id } from "../types/basic";
 import type {
   Project,
-  ProjectListRequestParams,
   ProjectCreate,
   ProjectUpdate,
+  ProjectListRequestParams,
+  ProjectListReorder,
 } from "../types/projects";
+import { HttpError } from "../utils/errors";
 
 export const getProject = async (id: Id) => {
   const query = `SELECT ${DB_PROJECT} FROM ${DB_PROJECTS} WHERE id = $1 LIMIT 1`;
   const result = await pool.query<Project>(query, [id]);
 
-  return result.rows[0];
+  const project = result.rows[0];
+  if (!project) throw new HttpError(404, "Project not found");
+
+  return project;
 };
 
 export const getProjects = async (params: ProjectListRequestParams) => {
@@ -129,9 +134,56 @@ export const updateProject = async (id: Id, body: ProjectUpdate) => {
 
 export const deleteProject = async (id: Id) => {
   const values = [id];
-
   const query = `DELETE FROM ${DB_PROJECTS} WHERE id = $${values.length}`;
+
   const result = await pool.query(query, values);
 
-  return !!result.rowCount && result.rowCount > 0;
+  if (!result.rowCount) throw new HttpError(404, "Project not found");
+};
+
+export const reorderProject = async (body: ProjectListReorder) => {
+  const { targetId, afterId } = body;
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+    await client.query(`LOCK TABLE ${DB_PROJECTS} IN SHARE ROW EXCLUSIVE MODE`);
+
+    const { rows } = await client.query(
+      `SELECT id FROM ${DB_PROJECTS} ORDER BY sort_order ASC, id ASC`,
+    );
+
+    const ids = rows.map((row) => row.id);
+
+    const isAfterProject = afterId !== null && afterId !== undefined;
+    const targetIndex = ids.indexOf(targetId);
+    const afterIndex = isAfterProject ? ids.indexOf(afterId) : -1;
+
+    if (targetIndex === -1)
+      throw new HttpError(404, "Target project not found");
+    if (isAfterProject && afterIndex === -1)
+      throw new HttpError(404, "After project not found");
+
+    ids.splice(targetIndex, 1);
+    const newIndex = isAfterProject ? ids.indexOf(afterId) + 1 : 0;
+    ids.splice(newIndex, 0, targetId);
+
+    const query = `
+        UPDATE projects AS p
+        SET sort_order = ordered.position
+        FROM unnest($1::int[]) WITH ORDINALITY
+          AS ordered(id, position)
+        WHERE p.id = ordered.id
+      `;
+    const values = [ids];
+
+    await client.query(query, values);
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 };

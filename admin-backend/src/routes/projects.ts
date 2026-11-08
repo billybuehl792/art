@@ -6,6 +6,7 @@ import {
   getProjectsCount,
   deleteProject,
   getProject,
+  reorderProject,
 } from "../queries/projects";
 import { HttpError } from "../utils/errors";
 import { idSchema } from "../schemas/basic";
@@ -13,6 +14,7 @@ import {
   projectCreateSchema,
   projectListRequestParamsSchema,
   projectListResponseSchema,
+  projectListReorderSchema,
   projectUpdateSchema,
 } from "../schemas/projects";
 
@@ -50,7 +52,7 @@ projectsRouter.get("/:id", async (req: Request, res: Response) => {
   const project = await getProject(projectId);
   if (!project) throw new HttpError(404, "Project not found");
 
-  return res.status(200).json(project);
+  res.status(200).json(project);
 });
 
 projectsRouter.patch("/:id", async (req: Request, res: Response) => {
@@ -59,16 +61,21 @@ projectsRouter.patch("/:id", async (req: Request, res: Response) => {
 
   const project = await updateProject(projectId, body);
 
-  return res.status(200).json(project);
+  res.status(200).json(project);
 });
 
 projectsRouter.delete("/:id", async (req: Request, res: Response) => {
   const id = idSchema.parse(req.params.id);
-  const deleted = await deleteProject(id);
+  await deleteProject(id);
 
-  if (!deleted) throw new HttpError(404, "Project not found");
+  res.sendStatus(204);
+});
 
-  return res.status(204).send();
+projectsRouter.patch("/reorder", async (req: Request, res: Response) => {
+  const body = projectListReorderSchema.parse(req.body);
+  await reorderProject(body);
+
+  res.sendStatus(204);
 });
 
 export default projectsRouter;

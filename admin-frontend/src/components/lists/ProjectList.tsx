@@ -5,7 +5,6 @@ import StatusCard from "@/components/cards/StatusCard";
 import ProjectListCard, {
   type ProjectListCardProps,
 } from "../cards/ProjectListCard";
-import type { MenuOption } from "@/types/basic";
 import type { Project } from "@/types/projects";
 
 export interface ProjectListProps extends StackProps {
@@ -15,12 +14,10 @@ export interface ProjectListProps extends StackProps {
   hasNextPage: boolean;
   isRefetching?: boolean;
   isFetchingNextPage: boolean;
-  projectOptions?: (project: Project) => MenuOption[];
-  onProjectClick?: ProjectListCardProps["onClick"];
   onFetchNextPage: VoidFunction;
   onRetry?: VoidFunction;
   slotProps?: {
-    item?: Partial<Omit<ProjectListCardProps, "project">>;
+    card?: (project: Project) => Partial<Omit<ProjectListCardProps, "project">>;
   };
 }
 
@@ -31,9 +28,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
   hasNextPage,
   isRefetching,
   isFetchingNextPage,
-  projectOptions,
   onFetchNextPage,
-  onProjectClick,
   onRetry,
   slotProps,
   ...props
@@ -81,9 +76,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
             key={project.id}
             project={project}
             disabled={isRefetching}
-            options={projectOptions?.(project)}
-            onClick={onProjectClick}
-            {...slotProps?.item}
+            {...slotProps?.card?.(project)}
           />
         ))
       )}

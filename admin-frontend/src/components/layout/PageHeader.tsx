@@ -33,7 +33,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   ...props
 }) => {
   return (
-    <StyledStack spacing={1} {...props} sx={sxArray({ py: 2 }, props?.sx)}>
+    <StyledStack spacing={1.5} {...props} sx={sxArray({ py: 2 }, props?.sx)}>
       <Stack
         direction="row"
         spacing={1}

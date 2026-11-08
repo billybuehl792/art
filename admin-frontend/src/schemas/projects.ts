@@ -49,13 +49,26 @@ export const projectUpdateSchema = z
     message: "At least one field must be provided",
   });
 
-export const projectListRequestParamsSchema = listRequestParamsSchema.extend({
-  search: z
-    .string()
-    .trim()
-    .optional()
-    .transform((v) => v || undefined),
-  category: projectCategoryEnum.optional().transform((v) => v || undefined),
+/** Lists */
+
+export const projectListRequestSchema = z.object({
+  params: listRequestParamsSchema.extend({
+    search: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => v || undefined),
+    category: projectCategoryEnum.optional().transform((v) => v || undefined),
+  }),
 });
 
 export const projectListResponseSchema = listResponseSchema(projectSchema);
+
+export const projectListReorderSchema = z
+  .object({
+    targetId: idSchema,
+    afterId: idSchema.nullable().optional(),
+  })
+  .refine(({ targetId, afterId }) => targetId !== afterId, {
+    message: "A project cannot be positioned after itself",
+  });
