@@ -9,7 +9,7 @@ export const truncateText: SxProps<Theme> = () => {
 };
 
 export const sxArray = (
-  ...sx: Array<SxProps<Theme> | undefined>
+  ...sx: Array<SxProps<Theme> | null | undefined | false>
 ): SxProps<Theme> => {
   return sx.flatMap((value) => {
     if (!value) return [];

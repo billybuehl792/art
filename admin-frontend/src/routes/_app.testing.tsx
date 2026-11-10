@@ -29,47 +29,29 @@ function RouteComponent() {
 
   /** Mutations */
 
-  const projectListReorderMutation = useMutation({
-    ...projectQueries.projects.reorder(),
-    onMutate: async (_body, { client }) => {
-      await client.cancelQueries(projectListQueryOptions);
-
-      const previousData = client.getQueryData(
-        projectListQueryOptions.queryKey,
-      );
-
-      return { previousData };
-    },
-    onError: (_, __, queryContext, { client }) => {
-      if (queryContext?.previousData)
-        client.setQueryData(
-          projectListQueryOptions.queryKey,
-          queryContext.previousData,
-        );
-    },
-  });
-  /** Data */
-
-  const projects =
-    projectListQuery.data?.pages.flatMap((page) => page.data.results) ?? [];
+  const projectListReorderMutation = useMutation(
+    projectQueries.projects.reorder(),
+  );
 
   /** Callbacks */
 
-  const handleOnSort: SortableListProps["onSort"] = (
+  const handleOnSort: SortableListProps["onSort"] = async (
     sortedProjects,
     targetId,
   ) => {
     if (!projectListQuery.data) return;
 
-    queryClient.setQueryData(
-      projectListQueryOptions.queryKey,
-      reorderInfiniteData(projectListQuery.data, sortedProjects),
-    );
+    await queryClient.cancelQueries(projectListQueryOptions);
+
+    const listQueryKey = projectListQueryOptions.queryKey;
+    const sorted = reorderInfiniteData(projectListQuery.data, sortedProjects);
+
+    queryClient.setQueryData(listQueryKey, sorted);
 
     const movedIndex = sortedProjects.findIndex((item) => item.id === targetId);
     const afterId = movedIndex > 0 ? sortedProjects[movedIndex - 1].id : null;
 
-    projectListReorderMutation.mutate({ targetId, afterId });
+    await projectListReorderMutation.mutateAsync({ targetId, afterId });
   };
 
   return (
@@ -82,14 +64,7 @@ function RouteComponent() {
           </Breadcrumbs>
         }
       />
-      <SortableList
-        items={projects}
-        disabled={projectListQuery.isFetching}
-        hasNextPage={projectListQuery.hasNextPage}
-        isFetchingNextPage={projectListQuery.isFetchingNextPage}
-        fetchNextPage={projectListQuery.fetchNextPage}
-        onSort={handleOnSort}
-      />
+      <SortableList query={projectListQuery} onSort={handleOnSort} />
     </Container>
   );
 }
