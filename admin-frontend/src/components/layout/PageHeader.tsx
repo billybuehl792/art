@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { sxArray, truncateText } from "@/utils/sx";
 
-interface PageHeaderProps extends Omit<StackProps, "title"> {
+export interface PageHeaderProps extends Omit<StackProps, "title"> {
   title: ReactNode;
   startContent?: ReactNode;
   endContent?: ReactNode;

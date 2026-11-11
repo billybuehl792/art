@@ -55,10 +55,12 @@ export const projectListRequestSchema = z.object({
   params: listRequestParamsSchema.extend({
     search: z
       .string()
-      .trim()
       .optional()
       .transform((v) => v || undefined),
-    category: projectCategoryEnum.optional().transform((v) => v || undefined),
+    category: projectCategoryEnum
+      .nullable()
+      .optional()
+      .transform((v) => v || undefined),
   }),
 });
 

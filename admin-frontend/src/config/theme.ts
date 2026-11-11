@@ -122,6 +122,9 @@ export const createAppTheme = () =>
         },
       },
       MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
+      MuiTab: {
+        styleOverrides: { root: { textTransform: "none" } },
+      },
       MuiToolbar: {
         styleOverrides: {
           root: ({ theme }) => ({

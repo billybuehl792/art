@@ -3,8 +3,19 @@ import { z } from "zod";
 export const idSchema = z.coerce.number().int().positive();
 
 export const listRequestParamsSchema = z.object({
-  page: z.coerce.number().int().min(1).optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional(),
+  page: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .transform((v) => (v === 1 ? undefined : v)),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .optional()
+    .transform((v) => (v === 1 ? undefined : v)),
 });
 
 export function listResponseSchema<T extends z.ZodType>(itemSchema: T) {

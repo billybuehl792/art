@@ -34,7 +34,12 @@ const SortableListItem: React.FC<SortableListItemProps> = ({
         props?.sx,
       )}
     >
-      <ListItemButton disabled={disabled}>{project.title}</ListItemButton>
+      <ListItemButton
+        disabled={disabled}
+        onClick={() => console.log("clicked")}
+      >
+        {project.title}
+      </ListItemButton>
     </ListItem>
   );
 };
