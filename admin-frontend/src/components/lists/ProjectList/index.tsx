@@ -1,9 +1,4 @@
 import React from "react";
-import type { AxiosResponse } from "axios";
-import type {
-  InfiniteData,
-  UseInfiniteQueryResult,
-} from "@tanstack/react-query";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import {
@@ -13,15 +8,18 @@ import {
   Stack,
   type StackProps,
 } from "@mui/material";
-import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import StatusCard from "@/components/cards/StatusCard";
 import ProjectListItem, { type ProjectListItemProps } from "./ProjectListItem";
-import type { Project, ProjectListResponse } from "@/types/projects";
+import type { Project } from "@/types/projects";
 
 export interface ProjectListProps extends StackProps {
-  query: UseInfiniteQueryResult<
-    InfiniteData<AxiosResponse<ProjectListResponse>>
-  >;
+  projects: Project[];
+  loading?: boolean;
+  error?: Error | null;
+  hasMore: boolean;
+  onLoadMore: VoidFunction;
+  onRefetch?: VoidFunction;
   onSort?: (projects: Project[], target: Project["id"]) => void;
   slotProps?: {
     card?: (
@@ -31,17 +29,21 @@ export interface ProjectListProps extends StackProps {
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({
-  query,
+  projects,
+  loading,
+  error,
+  hasMore,
+  onLoadMore,
+  onRefetch,
   onSort,
   slotProps,
   ...props
 }) => {
   /** Values */
 
-  const projects = query.data?.pages.flatMap((page) => page.data.results) ?? [];
+  const scrollRef = useInfiniteScroll({ disabled: loading, onLoadMore });
 
-  const isEmpty =
-    !query.isLoading && !query.isFetchingNextPage && projects.length <= 0;
+  const isEmpty = !loading && !error && projects.length < 1;
 
   /** Callbacks */
 
@@ -50,7 +52,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
       <ProjectListItem
         key={project.id}
         project={project}
-        disabled={query.isRefetching}
+        disabled={loading}
         {...(!!sortable && { sortIndex: index })}
         {...slotProps?.card?.(project)}
       />
@@ -70,19 +72,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
       status="error"
       message={error.message}
       action={
-        <Button
-          variant="contained"
-          loading={query.isFetching}
-          onClick={() => query.refetch()}
-        >
+        <Button variant="contained" loading={loading} onClick={onRefetch}>
           Try again
         </Button>
       }
       sx={{ mt: 2 }}
     />
   );
-
-  /** Callbacks */
 
   const handleOnDragEnd = (event: DragEndEvent) => {
     if (event.canceled) return;
@@ -100,8 +96,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   return (
     <Stack spacing={1} {...props}>
-      {query.error ? (
-        renderError(query.error)
+      {error ? (
+        renderError(error)
       ) : isEmpty ? (
         renderEmpty()
       ) : (
@@ -113,7 +109,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
           ) : (
             renderProjects()
           )}
-          {(!!query.isLoading || query.isFetchingNextPage) &&
+          {loading &&
+            (hasMore || !projects.length) &&
             Array.from({ length: 20 }).map((_, index) => (
               <Skeleton
                 key={`skeleton-${index}`}
@@ -121,12 +118,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                 sx={{ mt: 1 }}
               />
             ))}
-          <InfiniteScrollTrigger
-            children={<Skeleton variant="rectangular" />}
-            hasNextPage={query.hasNextPage}
-            isFetchingNextPage={query.isFetchingNextPage}
-            fetchNextPage={query.fetchNextPage}
-          />
+          <div ref={scrollRef} />
         </MenuList>
       )}
     </Stack>

@@ -6,8 +6,8 @@ import type {
 } from "@tanstack/react-query";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { MenuList, Skeleton, type MenuListProps } from "@mui/material";
-import InfiniteScrollTrigger from "../../layout/InfiniteScrollTrigger";
 import SortableListItem from "./SortableListItem";
 import type { Project, ProjectListResponse } from "@/types/projects";
 
@@ -24,6 +24,11 @@ const SortableList: React.FC<SortableListProps> = ({
   ...props
 }) => {
   /** Values */
+
+  const scrollRef = useInfiniteScroll({
+    disabled: query.isFetchingNextPage,
+    onLoadMore: query.fetchNextPage,
+  });
 
   const projects = query.data?.pages.flatMap((page) => page.data.results) ?? [];
 
@@ -50,22 +55,17 @@ const SortableList: React.FC<SortableListProps> = ({
           />
         ))}
       </DragDropProvider>
-      <InfiniteScrollTrigger
-        isFetchingNextPage={query.isFetchingNextPage}
-        hasNextPage={query.hasNextPage}
-        fetchNextPage={query.fetchNextPage}
-      >
-        <Skeleton variant="rectangular" height={40} />
-      </InfiniteScrollTrigger>
-      {(!!query.isLoading || query.isFetchingNextPage) &&
-        Array.from({ length: 20 }).map((_, index) => (
-          <Skeleton
-            key={`skeleton-${index}`}
-            variant="rectangular"
-            height={40}
-            sx={{ mb: 0.5 }}
-          />
-        ))}
+      {(query.isLoading || query.hasNextPage) && (
+        <div ref={scrollRef}>
+          {Array.from({ length: 20 }).map((_, index) => (
+            <Skeleton
+              key={`skeleton-${index}`}
+              variant="rectangular"
+              sx={{ mt: 1 }}
+            />
+          ))}
+        </div>
+      )}
     </MenuList>
   );
 };

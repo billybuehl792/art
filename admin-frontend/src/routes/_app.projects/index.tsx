@@ -19,14 +19,14 @@ import Link from "@/components/links/Link";
 import ProjectList, {
   type ProjectListProps,
 } from "@/components/lists/ProjectList";
+import ProjectListPageHeader, {
+  type ProjectListPageHeaderProps,
+} from "@/components/lists/ProjectList/ProjectListPageHeader";
 import { projectQueries } from "@/queries/projects";
 import { projectListRequestSchema } from "@/schemas/projects";
 import { reorderInfiniteData } from "@/utils/queries";
 import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
-import ProjectListPageHeader, {
-  type ProjectListPageHeaderProps,
-} from "@/components/lists/ProjectList/ProjectListPageHeader";
 
 const validateSearch = projectListRequestSchema.shape.params;
 
@@ -48,6 +48,11 @@ function RouteComponent() {
 
   const projectListQueryOptions = projectQueries.projects.get({ params });
   const projectListQuery = useInfiniteQuery(projectListQueryOptions);
+
+  /** Data */
+
+  const projects =
+    projectListQuery.data?.pages.flatMap((page) => page.data.results) ?? [];
 
   /** Mutations */
 
@@ -131,7 +136,12 @@ function RouteComponent() {
         onTabChange={handleOnTabChange}
       />
       <ProjectList
-        query={projectListQuery}
+        projects={projects}
+        hasMore={projectListQuery.hasNextPage}
+        loading={projectListQuery.isFetching}
+        error={projectListQuery.error}
+        onLoadMore={projectListQuery.fetchNextPage}
+        onRefetch={projectListQuery.refetch}
         onSort={handleOnSort}
         sx={{ my: 2 }}
         slotProps={{
