@@ -1,5 +1,4 @@
 import {
-  use,
   createContext,
   useState,
   useCallback,
@@ -9,16 +8,16 @@ import ConfirmDialog, {
   type ConfirmOptions,
 } from "@/components/modals/ConfirmDialog";
 
-type ConfirmContextValue = {
+interface ConfirmContextValue {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
-};
+}
 
-type PendingConfirm = {
+interface PendingConfirm {
   options: ConfirmOptions;
   resolve: (confirmed: boolean) => void;
-};
+}
 
-const ConfirmContext = createContext<ConfirmContextValue | null>(null);
+export const ConfirmContext = createContext<ConfirmContextValue | null>(null);
 
 const ConfirmProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -28,21 +27,17 @@ const ConfirmProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const confirm = useCallback((options: ConfirmOptions) => {
     return new Promise<boolean>((resolve) => {
-      setPending({
-        options,
-        resolve,
-      });
-
+      setPending({ options, resolve });
       setOpen(true);
     });
   }, []);
 
-  const handleConfirm = () => {
+  const handleOnConfirm = () => {
     pending?.resolve(true);
     setOpen(false);
   };
 
-  const handleCancel = () => {
+  const handleOnCancel = () => {
     pending?.resolve(false);
     setOpen(false);
   };
@@ -54,20 +49,13 @@ const ConfirmProvider: React.FC<PropsWithChildren> = ({ children }) => {
       {children}
       <ConfirmDialog
         open={open}
-        onClose={handleCancel}
-        onConfirm={handleConfirm}
+        onClose={handleOnCancel}
+        onConfirm={handleOnConfirm}
         onTransitionExited={handleExited}
         {...pending?.options}
       />
     </ConfirmContext.Provider>
   );
-};
-
-export const useConfirm = () => {
-  const context = use(ConfirmContext);
-  if (!context)
-    throw new Error("useConfirm must be used within a ConfirmProvider");
-  return context.confirm;
 };
 
 export default ConfirmProvider;

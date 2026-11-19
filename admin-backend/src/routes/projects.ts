@@ -28,14 +28,14 @@ projectsRouter.get("/", async (req: Request, res: Response) => {
     getProjectsCount(params),
   ]);
 
-  const response = projectListResponseSchema.parse({
-    page: params.page,
-    limit: params.limit,
-    total,
-    results,
-  });
-
-  res.json(response);
+  res.json(
+    projectListResponseSchema.parse({
+      page: params.page,
+      limit: params.limit,
+      total,
+      results,
+    }),
+  );
 });
 
 projectsRouter.post("/", async (req: Request, res: Response) => {

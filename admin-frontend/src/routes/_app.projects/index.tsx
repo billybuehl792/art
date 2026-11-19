@@ -14,7 +14,7 @@ import {
   Edit as EditIcon,
   Info as InfoIcon,
 } from "@mui/icons-material";
-import { useConfirm } from "@/providers/ConfirmProvider";
+import useConfirm from "@/hooks/useConfirm";
 import Link from "@/components/links/Link";
 import ProjectList, {
   type ProjectListProps,
@@ -73,11 +73,16 @@ function RouteComponent() {
   const handleProjectOnClick = (project: Project) =>
     navigate({ to: "$id", params: { id: String(project.id) } });
 
+  const handleProjectEdit = (project: Project) =>
+    navigate({ to: "$id/edit", params: { id: String(project.id) } });
+
   const handleProjectDelete = (project: Project) =>
     confirm({
       title: `Delete "${project.title}"?`,
       description:
         "This project and its associated data will be permanently deleted.",
+      confirmButton: { children: "Delete", color: "error" },
+      cancelButton: { color: "primary" },
     }).then((confirmed) => {
       if (confirmed) projectDeleteMutation.mutate(project.id);
     });
@@ -112,8 +117,7 @@ function RouteComponent() {
       id: "edit",
       title: "Edit",
       Icon: EditIcon,
-      onClick: () =>
-        navigate({ to: "$id/edit", params: { id: String(project.id) } }),
+      onClick: () => handleProjectEdit(project),
     },
     {
       id: "delete",

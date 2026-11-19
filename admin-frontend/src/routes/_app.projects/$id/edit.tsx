@@ -14,13 +14,13 @@ import {
   Typography,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
+import useConfirm from "@/hooks/useConfirm";
 import Link from "@/components/links/Link";
 import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
 import PageHeader from "@/components/layout/PageHeader";
 import ProjectForm, {
   type ProjectFormProps,
 } from "@/components/forms/ProjectForm";
-import { useConfirm } from "@/providers/ConfirmProvider";
 import { idSchema } from "@/schemas/basic";
 import { uploadCreateSchema } from "@/schemas/uploads";
 import { projectUpdateSchema } from "@/schemas/projects";
@@ -28,6 +28,7 @@ import { isSameFile, urlToFile } from "@/utils/files";
 import { projectQueries } from "@/queries/projects";
 import { uploadQueries } from "@/queries/uploads";
 import type { MenuOption } from "@/types/basic";
+import type { Project, ProjectUpdate } from "@/types/projects";
 
 export const Route = createFileRoute("/_app/projects/$id/edit")({
   component: RouteComponent,
@@ -78,51 +79,54 @@ function RouteComponent() {
     else router.navigate({ to: "/projects" });
   };
 
-  const handleUpdateProject: ProjectFormProps["onSubmit"] = async ({
+  const handleProjectNavigate = (project: Project) =>
+    navigate({
+      to: "/projects/$id",
+      params: { id: String(project.id) },
+      ignoreBlocker: true,
+    });
+
+  const handleProjectUpdate: ProjectFormProps["onSubmit"] = async ({
     media,
     ...data
   }) => {
-    let mediaBody;
+    let mediaBody:
+      | Pick<ProjectUpdate, "mediaType" | "mediaUrl" | "thumbnailUrl">
+      | undefined;
 
-    if (media === null) {
-      mediaBody = { mediaType: null, mediaUrl: null, thumbnailUrl: null };
-    } else {
+    if (media) {
       const isSameMediaFile =
-        !!project.media && !!media && isSameFile(media, project.media);
+        !!project.media && isSameFile(media, project.media);
+
       if (!isSameMediaFile) {
         const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
           uploadCreateSchema.parse({ file: media }),
         );
         mediaBody = mediaUploadResponse.data;
       }
+    } else {
+      mediaBody = { mediaType: null, mediaUrl: null, thumbnailUrl: null };
     }
 
     await projectUpdateMutation.mutateAsync(
       projectUpdateSchema.parse({ ...data, ...mediaBody }),
-      {
-        onSuccess: (res) =>
-          navigate({
-            to: "/projects/$id",
-            params: { id: String(res.data.id) },
-            ignoreBlocker: true,
-          }),
-      },
+      { onSuccess: (res) => handleProjectNavigate(res.data) },
     );
   };
 
-  const handleDeleteProject = async () => {
-    const confirmed = await confirm({
-      title: "Delete project?",
+  const handleProjectDelete = () =>
+    confirm({
+      title: `Delete "${project.title}"?`,
       description:
         "This project and its associated data will be permanently deleted.",
+      confirmButton: { children: "Delete", color: "error" },
+      cancelButton: { color: "primary" },
+    }).then((confirmed) => {
+      if (confirmed)
+        projectDeleteMutation.mutate(undefined, {
+          onSuccess: () => navigate({ to: "/projects" }),
+        });
     });
-
-    if (!confirmed) return;
-
-    await projectDeleteMutation.mutateAsync(undefined, {
-      onSuccess: () => navigate({ to: "/projects" }),
-    });
-  };
 
   /** Options */
 
@@ -132,7 +136,7 @@ function RouteComponent() {
       title: "Delete",
       color: "error",
       Icon: DeleteIcon,
-      onClick: handleDeleteProject,
+      onClick: handleProjectDelete,
     },
   ];
 
@@ -156,7 +160,7 @@ function RouteComponent() {
           <CardContent>
             <ProjectForm
               defaultValues={project}
-              onSubmit={handleUpdateProject}
+              onSubmit={handleProjectUpdate}
               onCancel={handleBack}
             />
           </CardContent>

@@ -45,6 +45,9 @@ export const projectUpdateSchema = z
     priority: z.coerce.number().int().positive().optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
   })
+  .transform((data) =>
+    Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined)),
+  )
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
   });

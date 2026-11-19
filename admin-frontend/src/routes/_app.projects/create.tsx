@@ -21,6 +21,8 @@ import { projectQueries } from "@/queries/projects";
 import { uploadQueries } from "@/queries/uploads";
 import { uploadCreateSchema } from "@/schemas/uploads";
 import { projectCreateSchema } from "@/schemas/projects";
+import type { UploadResponse } from "@/types/uploads";
+import type { Project } from "@/types/projects";
 
 export const Route = createFileRoute("/_app/projects/create")({
   component: RouteComponent,
@@ -45,11 +47,18 @@ function RouteComponent() {
     else router.navigate({ to: "/projects" });
   };
 
+  const handleNavigateProject = (project: Project) =>
+    navigate({
+      to: "/projects/$id",
+      params: { id: String(project.id) },
+      ignoreBlocker: true,
+    });
+
   const handleCreateProject: ProjectFormProps["onSubmit"] = async ({
     media,
     ...data
   }) => {
-    let mediaBody;
+    let mediaBody: UploadResponse | undefined;
 
     if (media) {
       const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
@@ -60,14 +69,7 @@ function RouteComponent() {
 
     await projectCreateMutation.mutateAsync(
       projectCreateSchema.parse({ ...data, ...mediaBody }),
-      {
-        onSuccess: ({ data }) =>
-          navigate({
-            to: "/projects/$id",
-            params: { id: String(data.id) },
-            ignoreBlocker: true,
-          }),
-      },
+      { onSuccess: ({ data }) => handleNavigateProject(data) },
     );
   };
 

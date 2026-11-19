@@ -27,10 +27,6 @@ export const urlToFile = async (url: string): Promise<File> => {
   });
 };
 
-export const isSameFile = (file1: File, file2: File) => {
-  return (
-    file1.name === file2.name &&
-    file1.size === file2.size &&
-    file1.type === file2.type
-  );
+export const isSameFile = (f1: File, f2: File) => {
+  return f1.name === f2.name && f1.size === f2.size && f1.type === f2.type;
 };

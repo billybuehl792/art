@@ -13,7 +13,7 @@ import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import Link from "@/components/links/Link";
 import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
 import PageHeader from "@/components/layout/PageHeader";
-import { useConfirm } from "@/providers/ConfirmProvider";
+import useConfirm from "@/hooks/useConfirm";
 import { projectQueries } from "@/queries/projects";
 import { idSchema } from "@/schemas/basic";
 import type { MenuOption } from "@/types/basic";
@@ -23,11 +23,11 @@ export const Route = createFileRoute("/_app/projects/$id/")({
     const idParse = idSchema.safeParse(params.id);
     if (!idParse.success) throw notFound();
 
-    const { data } = await context.queryClient.query(
+    const res = await context.queryClient.query(
       projectQueries.projects.project(idParse.data).get(),
     );
 
-    return data;
+    return res.data;
   },
   component: RouteComponent,
 });
@@ -47,19 +47,22 @@ function RouteComponent() {
 
   /** Callbacks */
 
-  const handleDeleteProject = async () => {
-    const confirmed = await confirm({
-      title: "Delete project?",
+  const handleProjectEdit = () =>
+    navigate({ to: "/projects/$id/edit", params: { id: String(project.id) } });
+
+  const handleProjectDelete = () =>
+    confirm({
+      title: `Delete "${project.title}"?`,
       description:
         "This project and its associated data will be permanently deleted.",
+      confirmButton: { children: "Delete", color: "error" },
+      cancelButton: { color: "primary" },
+    }).then((confirmed) => {
+      if (confirmed)
+        projectDeleteMutation.mutate(undefined, {
+          onSuccess: () => navigate({ to: "/projects" }),
+        });
     });
-
-    if (!confirmed) return;
-
-    await projectDeleteMutation.mutateAsync(undefined, {
-      onSuccess: () => navigate({ to: "/projects" }),
-    });
-  };
 
   /** Options */
 
@@ -68,18 +71,14 @@ function RouteComponent() {
       id: "edit",
       title: "Edit",
       Icon: EditIcon,
-      onClick: () =>
-        navigate({
-          to: "/projects/$id/edit",
-          params: { id: String(project.id) },
-        }),
+      onClick: handleProjectEdit,
     },
     {
       id: "delete",
       title: "Delete",
       color: "error",
       Icon: DeleteIcon,
-      onClick: handleDeleteProject,
+      onClick: handleProjectDelete,
     },
   ];
 

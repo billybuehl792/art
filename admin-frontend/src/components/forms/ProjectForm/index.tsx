@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type SubmitEventHandler } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -10,8 +10,8 @@ import {
   TextField,
   type BoxProps,
 } from "@mui/material";
+import useConfirm from "@/hooks/useConfirm";
 import FileUploadField from "@/components/fields/FileUploadField";
-import { useConfirm } from "@/providers/ConfirmProvider";
 import { projectCategoryEnum } from "@/schemas/projects";
 
 const projectFormSchema = z.object({
@@ -40,7 +40,7 @@ const DEFAULT_VALUES: ProjectFormValues = {
 
 export interface ProjectFormProps extends Omit<
   BoxProps<"form">,
-  "component" | "onSubmit"
+  "component" | "onSubmit" | "onReset"
 > {
   defaultValues?: ProjectFormValues;
   onSubmit: (values: ProjectFormValues) => Promise<void>;
@@ -67,15 +67,31 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     },
   });
 
+  /** Callbacks */
+
+  const handleOnSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void form.handleSubmit();
+  };
+
+  const handleOnReset: SubmitEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    void form.reset();
+  };
+
   /** Effects */
 
   useBlocker({
-    enableBeforeUnload: form.state.isDirty,
+    enableBeforeUnload: form.state.isDirty && !form.state.isDefaultValue,
     shouldBlockFn: () =>
-      form.state.isDirty
+      form.state.isDirty && !form.state.isDefaultValue
         ? confirm({
             title: "Unsaved Changes",
-            description: "Are you sure you want to exit?",
+            description: "Changes will be lost. Are you sure you want to exit?",
+            confirmButton: { children: "Exit", color: "error" },
+            cancelButton: { color: "primary" },
           }).then((res) => !res)
         : false,
   });
@@ -86,11 +102,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       noValidate
       autoComplete="off"
       {...props}
-      onSubmit={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        void form.handleSubmit();
-      }}
+      onSubmit={handleOnSubmit}
+      onReset={handleOnReset}
     >
       <Stack spacing={2}>
         <form.Field name="title">
@@ -173,15 +186,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               Cancel
             </Button>
           )}
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
-            {([canSubmit, isSubmitting]) => (
+          <form.Subscribe selector={(state) => state}>
+            {({ isDirty, isDefaultValue, canSubmit, isSubmitting }) => (
               <Button
                 type="submit"
                 variant="contained"
                 loading={isSubmitting}
-                disabled={!canSubmit}
+                disabled={!canSubmit || !isDirty || isDefaultValue}
               >
                 Submit
               </Button>
