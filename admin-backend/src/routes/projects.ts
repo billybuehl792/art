@@ -7,7 +7,7 @@ import {
   deleteProject,
   getProject,
   reorderProject,
-} from "../queries/projects";
+} from "../db/queries/projects";
 import { HttpError } from "../utils/errors";
 import { idSchema } from "../schemas/basic";
 import {

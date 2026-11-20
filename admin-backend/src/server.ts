@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import app from "./app";
 import fs from "node:fs/promises";
-import { testDatabaseConnection } from "./db";
+import { checkDbConnection } from "./db/utils";
 import { UPLOAD_DIR, UPLOAD_THUMBNAIL_DIR } from "./constants/uploads";
 
 const start = async () => {
@@ -14,7 +14,7 @@ const start = async () => {
     fs.mkdir(UPLOAD_THUMBNAIL_DIR, { recursive: true }),
   ]);
 
-  await testDatabaseConnection();
+  await checkDbConnection();
 
   const host = process.env.HOST;
   if (!host) throw new Error("HOST is not configured");

@@ -9,7 +9,9 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "vitest"
+    "test": "vitest",
+    "projects:seed": "tsx scripts/projects/seed.ts",
+    "projects:clear": "tsx scripts/projects/clear.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",

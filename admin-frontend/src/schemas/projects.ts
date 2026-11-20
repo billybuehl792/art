@@ -8,7 +8,7 @@ export const projectSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
   description: z.string(),
-  category: projectCategoryEnum.nullable(),
+  category: projectCategoryEnum,
   link: z.string().nullable(),
   mediaType: z.string().nullable(),
   mediaUrl: z.string().nullable(),
@@ -23,12 +23,12 @@ export const projectCreateSchema = z.object({
   title: z.string().trim().min(1),
   subtitle: z.string().optional().default(""),
   description: z.string().optional().default(""),
-  category: projectCategoryEnum.nullable().optional(),
+  category: projectCategoryEnum.default("art"),
   link: z.string().nullable().optional(),
   mediaType: z.string().nullable().optional(),
   mediaUrl: z.string().nullable().optional(),
   thumbnailUrl: z.string().nullable().optional(),
-  priority: z.coerce.number().int().positive().optional().default(1),
+  priority: z.coerce.number().int().min(0).optional().default(0),
   sortOrder: z.coerce.number().int().min(0).optional().default(0),
 });
 
@@ -37,12 +37,12 @@ export const projectUpdateSchema = z
     title: z.string().trim().min(1).optional(),
     subtitle: z.string().optional(),
     description: z.string().optional(),
-    category: projectCategoryEnum.nullable().optional(),
+    category: projectCategoryEnum.optional(),
     link: z.string().nullable().optional(),
     mediaType: z.string().nullable().optional(),
     mediaUrl: z.string().nullable().optional(),
     thumbnailUrl: z.string().nullable().optional(),
-    priority: z.coerce.number().int().positive().optional(),
+    priority: z.coerce.number().int().min(0).optional(),
     sortOrder: z.coerce.number().int().min(0).optional(),
   })
   .transform((data) =>

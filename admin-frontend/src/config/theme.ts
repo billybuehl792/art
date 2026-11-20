@@ -125,6 +125,7 @@ export const createAppTheme = () =>
       MuiTab: {
         styleOverrides: { root: { textTransform: "none" } },
       },
+      MuiTextField: { defaultProps: { size: "small" } },
       MuiToolbar: {
         styleOverrides: {
           root: ({ theme }) => ({

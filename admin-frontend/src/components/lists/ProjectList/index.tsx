@@ -101,7 +101,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
       ) : isEmpty ? (
         renderEmpty()
       ) : (
-        <MenuList>
+        <MenuList sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {onSort ? (
             <DragDropProvider onDragEnd={handleOnDragEnd}>
               {renderProjects(true)}
@@ -114,8 +114,8 @@ const ProjectList: React.FC<ProjectListProps> = ({
             Array.from({ length: 20 }).map((_, index) => (
               <Skeleton
                 key={`skeleton-${index}`}
-                variant="rectangular"
-                sx={{ mt: 1 }}
+                variant="rounded"
+                sx={{ mt: 0.5 }}
               />
             ))}
           <div ref={scrollRef} />

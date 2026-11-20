@@ -6,6 +6,11 @@ import {
   Box,
   Button,
   Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
   type BoxProps,
@@ -14,24 +19,24 @@ import useConfirm from "@/hooks/useConfirm";
 import FileUploadField from "@/components/fields/FileUploadField";
 import { projectCategoryEnum } from "@/schemas/projects";
 
+type ProjectFormValues = z.infer<typeof projectFormSchema>;
+
 const projectFormSchema = z.object({
   title: z.string().trim().min(1),
   subtitle: z.string(),
   description: z.string(),
-  category: projectCategoryEnum.nullable(),
+  category: projectCategoryEnum,
   link: z.string().nullable(),
   media: z.custom<File>((value) => value instanceof File).nullable(),
   priority: z.number().nonnegative(),
   sortOrder: z.number().nonnegative(),
 });
 
-type ProjectFormValues = z.infer<typeof projectFormSchema>;
-
 const DEFAULT_VALUES: ProjectFormValues = {
   title: "",
   subtitle: "",
   description: "",
-  category: null,
+  category: "art",
   media: null,
   link: null,
   priority: 1,
@@ -92,7 +97,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             description: "Changes will be lost. Are you sure you want to exit?",
             confirmButton: { children: "Exit", color: "error" },
             cancelButton: { color: "primary" },
-          }).then((res) => !res)
+          }).then((confirmed) => !confirmed)
         : false,
   });
 
@@ -106,79 +111,118 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       onReset={handleOnReset}
     >
       <Stack spacing={2}>
-        <form.Field name="title">
-          {(field) => (
-            <TextField
-              label="Title"
-              size="small"
-              value={field.state.value}
-              disabled={field.form.state.isSubmitting}
-              error={field.state.meta.isTouched && !field.state.meta.isValid}
-              helperText={field.state.meta.errors[0]?.message}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )}
-        </form.Field>
-        <form.Field name="subtitle">
-          {(field) => (
-            <TextField
-              label="Subtitle"
-              size="small"
-              value={field.state.value}
-              disabled={field.form.state.isSubmitting}
-              error={field.state.meta.isTouched && !field.state.meta.isValid}
-              helperText={field.state.meta.errors[0]?.message}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )}
-        </form.Field>
-        <form.Field name="description">
-          {(field) => (
-            <TextField
-              label="Description"
-              size="small"
-              multiline
-              rows={3}
-              value={field.state.value}
-              disabled={field.form.state.isSubmitting}
-              error={field.state.meta.isTouched && !field.state.meta.isValid}
-              helperText={field.state.meta.errors[0]?.message}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )}
-        </form.Field>
+        <form.Subscribe
+          selector={(state) => ({ disabled: state.isSubmitting })}
+        >
+          {({ disabled }) => (
+            <Stack spacing={2}>
+              <form.Field
+                name="title"
+                children={({ state, handleBlur, handleChange }) => (
+                  <TextField
+                    label="Title"
+                    value={state.value}
+                    disabled={disabled}
+                    error={!state.meta.isValid}
+                    helperText={state.meta.errors[0]?.message}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                  />
+                )}
+              />
 
-        <form.Field name="media">
-          {(field) => (
-            <FileUploadField
-              label="Media"
-              disabled={field.form.state.isSubmitting}
-              value={field.state.value}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
+              <form.Field name="subtitle">
+                {({ state, handleBlur, handleChange }) => (
+                  <TextField
+                    label="Subtitle"
+                    value={state.value}
+                    disabled={disabled}
+                    error={state.meta.isTouched && !state.meta.isValid}
+                    helperText={state.meta.errors[0]?.message}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                  />
+                )}
+              </form.Field>
 
-        <Divider />
+              <form.Field name="description">
+                {(field) => (
+                  <TextField
+                    label="Description"
+                    multiline
+                    rows={3}
+                    value={field.state.value}
+                    disabled={disabled}
+                    error={!field.state.meta.isValid}
+                    helperText={field.state.meta.errors[0]?.message}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </form.Field>
 
-        <form.Field name="priority">
-          {(field) => (
-            <TextField
-              label="Priority"
-              size="small"
-              type="number"
-              value={field.state.value}
-              disabled={field.form.state.isSubmitting}
-              error={field.state.meta.isTouched && !field.state.meta.isValid}
-              helperText={field.state.meta.errors[0]?.message}
-              onChange={(e) => field.handleChange(Number(e.target.value))}
-              onBlur={field.handleBlur}
-            />
+              <form.Field name="category">
+                {(field) => (
+                  <FormControl>
+                    <FormLabel component="div" id={`${field.name}-label`}>
+                      Category
+                    </FormLabel>
+                    <RadioGroup
+                      name={field.name}
+                      value={field.state.value}
+                      row
+                      aria-labelledby={`${field.name}-label`}
+                      onChange={(_, value) =>
+                        field.handleChange(projectCategoryEnum.parse(value))
+                      }
+                    >
+                      {projectCategoryEnum.options.map((category) => (
+                        <FormControlLabel
+                          key={category}
+                          value={category}
+                          disabled={disabled}
+                          control={<Radio size="small" />}
+                          label={category}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                )}
+              </form.Field>
+
+              <form.Field name="media">
+                {(field) => (
+                  <FileUploadField
+                    label="Media"
+                    disabled={disabled}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                  />
+                )}
+              </form.Field>
+
+              <Divider />
+
+              <form.Field name="priority">
+                {(field) => (
+                  <TextField
+                    label="Priority"
+                    size="small"
+                    type="number"
+                    value={field.state.value}
+                    disabled={disabled}
+                    error={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
+                    helperText={field.state.meta.errors[0]?.message}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              </form.Field>
+            </Stack>
           )}
-        </form.Field>
+        </form.Subscribe>
 
         <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
           {!!onCancel && (
@@ -186,13 +230,18 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
               Cancel
             </Button>
           )}
-          <form.Subscribe selector={(state) => state}>
-            {({ isDirty, isDefaultValue, canSubmit, isSubmitting }) => (
+          <form.Subscribe
+            selector={(state) => ({
+              canSubmit: state.canSubmit,
+              isSubmitting: state.isSubmitting,
+            })}
+          >
+            {({ canSubmit, isSubmitting }) => (
               <Button
                 type="submit"
                 variant="contained"
                 loading={isSubmitting}
-                disabled={!canSubmit || !isDirty || isDefaultValue}
+                disabled={!canSubmit}
               >
                 Submit
               </Button>
