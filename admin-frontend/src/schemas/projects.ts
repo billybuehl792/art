@@ -72,7 +72,8 @@ export const projectListResponseSchema = listResponseSchema(projectSchema);
 export const projectListReorderSchema = z
   .object({
     targetId: idSchema,
-    afterId: idSchema.nullable().optional(),
+    afterId: idSchema.nullable(),
+    category: projectCategoryEnum,
   })
   .refine(({ targetId, afterId }) => targetId !== afterId, {
     message: "A project cannot be positioned after itself",

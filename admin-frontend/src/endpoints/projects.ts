@@ -20,10 +20,8 @@ export const projectEndpoints = {
       delete: () => apiClient.delete<void>(`/projects/${id}`),
     }),
     reorder: {
-      patch: (body: ProjectListReorder) => {
-        throw new Error("not implemented ");
-        return apiClient.patch<void>(`/projects/reorder`, body);
-      },
+      patch: (body: ProjectListReorder) =>
+        apiClient.patch<void>("/projects/reorder", body),
     },
   },
 };

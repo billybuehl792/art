@@ -1,7 +1,8 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import {
   Avatar,
+  IconButton,
   ListItem,
   ListItemAvatar,
   ListItemButton,
@@ -9,6 +10,7 @@ import {
   Stack,
   type ListItemProps,
 } from "@mui/material";
+import { DragIndicator as DragIndicatorIcon } from "@mui/icons-material";
 import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
 import { sxArray, truncateText } from "@/utils/sx";
 import type { Project } from "@/types/projects";
@@ -22,6 +24,7 @@ interface ProjectListItemBaseProps extends Omit<
   sortIndex?: number;
   disabled?: boolean;
   options?: MenuOption[];
+  startContent?: ReactNode;
   onClick?: (project: Project) => void;
 }
 
@@ -33,6 +36,7 @@ const ProjectListItemBase: React.FC<ProjectListItemBaseProps> = ({
   project,
   disabled,
   options,
+  startContent,
   onClick,
   ...props
 }) => {
@@ -40,6 +44,7 @@ const ProjectListItemBase: React.FC<ProjectListItemBaseProps> = ({
 
   const renderBody = () => (
     <>
+      {startContent}
       {!!project.thumbnailUrl && (
         <ListItemAvatar>
           <Avatar
@@ -106,16 +111,28 @@ const ProjectListItemBase: React.FC<ProjectListItemBaseProps> = ({
 const SortableProjectListItem: React.FC<ProjectListItemProps> = ({
   project,
   sortIndex = 0,
+  startContent,
   ...props
 }) => {
   /** Values */
 
-  const { ref, isDragging } = useSortable({ id: project.id, index: sortIndex });
+  const { ref, handleRef, isDragging } = useSortable({
+    id: project.id,
+    index: sortIndex,
+  });
 
   return (
     <ProjectListItemBase
       ref={ref}
       project={project}
+      startContent={
+        <>
+          <IconButton ref={handleRef} size="small" sx={{ mr: 1 }}>
+            <DragIndicatorIcon />
+          </IconButton>
+          {startContent}
+        </>
+      }
       {...props}
       sx={sxArray(
         isDragging && {

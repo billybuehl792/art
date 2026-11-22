@@ -44,6 +44,9 @@ function RouteComponent() {
   const queryClient = useQueryClient();
   const confirm = useConfirm();
 
+  const { category, search } = params;
+  const isSortable = !!category && !search;
+
   /** Queries */
 
   const projectListQueryOptions = projectQueries.projects.get({ params });
@@ -87,21 +90,23 @@ function RouteComponent() {
       if (confirmed) projectDeleteMutation.mutate(project.id);
     });
 
-  const handleOnSort: ProjectListProps["onSort"] = async (
-    sortedProjects,
+  const handleOnSort: ProjectListProps["onSort"] = async ({
     targetId,
-  ) => {
-    if (!projectListQuery.data) return;
+    afterId,
+    sorted,
+  }) => {
+    if (!isSortable || !projectListQuery.data) return;
 
     await queryClient.cancelQueries(projectListQueryOptions);
 
-    const sorted = reorderInfiniteData(projectListQuery.data, sortedProjects);
-    queryClient.setQueryData(projectListQueryOptions.queryKey, sorted);
+    const sortedProjects = reorderInfiniteData(projectListQuery.data, sorted);
+    queryClient.setQueryData(projectListQueryOptions.queryKey, sortedProjects);
 
-    const movedIndex = sortedProjects.findIndex((item) => item.id === targetId);
-    const afterId = movedIndex > 0 ? sortedProjects[movedIndex - 1].id : null;
-
-    await projectListReorderMutation.mutateAsync({ targetId, afterId });
+    await projectListReorderMutation.mutateAsync({
+      targetId,
+      afterId,
+      category,
+    });
   };
 
   /** Options */
@@ -146,7 +151,7 @@ function RouteComponent() {
         error={projectListQuery.error}
         onLoadMore={projectListQuery.fetchNextPage}
         onRefetch={projectListQuery.refetch}
-        onSort={handleOnSort}
+        {...(isSortable && { onSort: handleOnSort })}
         sx={{ my: 2 }}
         slotProps={{
           card: (project) => ({

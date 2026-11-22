@@ -1,5 +1,6 @@
 import React from "react";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { isSortableOperation } from "@dnd-kit/react/sortable";
 import { move } from "@dnd-kit/helpers";
 import {
   Button,
@@ -15,12 +16,17 @@ import type { Project } from "@/types/projects";
 
 export interface ProjectListProps extends StackProps {
   projects: Project[];
+  disabled?: boolean;
   loading?: boolean;
   error?: Error | null;
   hasMore: boolean;
   onLoadMore: VoidFunction;
   onRefetch?: VoidFunction;
-  onSort?: (projects: Project[], target: Project["id"]) => void;
+  onSort?: (body: {
+    targetId: number;
+    afterId: number;
+    sorted: Project[];
+  }) => void;
   slotProps?: {
     card?: (
       project: Project,
@@ -30,6 +36,7 @@ export interface ProjectListProps extends StackProps {
 
 const ProjectList: React.FC<ProjectListProps> = ({
   projects,
+  disabled,
   loading,
   error,
   hasMore,
@@ -47,13 +54,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
   /** Callbacks */
 
-  const renderProjects = (sortable?: boolean) =>
+  const renderProjects = (options?: { sortable?: boolean }) =>
     projects.map((project, index) => (
       <ProjectListItem
         key={project.id}
         project={project}
-        disabled={loading}
-        {...(!!sortable && { sortIndex: index })}
+        disabled={loading || disabled}
+        {...(!!options?.sortable && { sortIndex: index })}
         {...slotProps?.card?.(project)}
       />
     ));
@@ -81,17 +88,22 @@ const ProjectList: React.FC<ProjectListProps> = ({
   );
 
   const handleOnDragEnd = (event: DragEndEvent) => {
-    if (event.canceled) return;
+    if (event.canceled || !isSortableOperation(event.operation) || !onSort)
+      return;
 
     const targetId = event.operation.target?.id;
     if (!targetId) return;
 
+    const initialIndex = event.operation.source?.initialIndex;
+    const endIndex = event.operation.target?.index;
+
+    if (initialIndex == null || endIndex == null || initialIndex === endIndex)
+      return;
+
     const sorted = move(projects, event);
+    const afterId = sorted[endIndex - 1]?.id ?? null;
 
-    const hasChanged = projects.some((p, index) => p.id !== sorted[index].id);
-    if (!hasChanged) return;
-
-    onSort?.(sorted, Number(targetId));
+    onSort({ targetId: Number(targetId), afterId, sorted });
   };
 
   return (
@@ -104,7 +116,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         <MenuList sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {onSort ? (
             <DragDropProvider onDragEnd={handleOnDragEnd}>
-              {renderProjects(true)}
+              {renderProjects({ sortable: true })}
             </DragDropProvider>
           ) : (
             renderProjects()
@@ -115,7 +127,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
               <Skeleton
                 key={`skeleton-${index}`}
                 variant="rounded"
-                sx={{ mt: 0.5 }}
+                sx={{ mt: 0.5, height: 72 }}
               />
             ))}
           <div ref={scrollRef} />

@@ -104,50 +104,68 @@ export const deleteProject = async (id: Id) => {
   if (!result.rowCount) throw new HttpError(404, "Project not found");
 };
 
-export const reorderProject = async (body: ProjectListReorder) => {
-  const { targetId, afterId } = body;
+export const reorderProject = async ({
+  targetId,
+  afterId,
+  category,
+}: ProjectListReorder) => {
+  if (targetId === afterId)
+    throw new HttpError(400, "Cannot position project after itself");
+
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
     await client.query(`LOCK TABLE ${DB_PROJECTS} IN SHARE ROW EXCLUSIVE MODE`);
 
-    const targetProject = await getProject(targetId);
-    const afterProject = afterId ? await getProject(afterId) : null;
-
-    const { rows } = await client.query(
-      `SELECT id FROM ${DB_PROJECTS} ORDER BY sort_order ASC, id ASC`,
+    const projectListQuery = await client.query<Project>(
+      `SELECT ${DB_PROJECT}
+      FROM ${DB_PROJECTS}
+      WHERE category = $1
+      ORDER BY sort_order ASC, id ASC
+      FOR UPDATE`,
+      [category],
     );
 
-    const ids = rows.map((row) => row.id);
+    let targetProject: (Project & { index: number }) | undefined;
+    let afterProject: (Project & { index: number }) | undefined;
+    const projectIds = projectListQuery.rows.map((project, index) => {
+      if (project.id === targetId) targetProject = { ...project, index };
+      else if (project.id === afterId) afterProject = { ...project, index };
+      return project.id;
+    });
 
-    const isAfterProject = afterId !== null && afterId !== undefined;
-    const targetIndex = ids.indexOf(targetId);
-    const afterIndex = isAfterProject ? ids.indexOf(afterId) : -1;
-
-    if (targetIndex === -1)
-      throw new HttpError(404, "Target project not found");
-    if (isAfterProject && afterIndex === -1)
+    if (!targetProject) throw new HttpError(404, "Target project not found");
+    if (afterId != null && !afterProject)
       throw new HttpError(404, "After project not found");
+    if (afterProject && afterProject.category !== targetProject.category)
+      throw new HttpError(404, "Cannot reorder projects of different types");
 
-    ids.splice(targetIndex, 1);
-    const newIndex = isAfterProject ? ids.indexOf(afterId) + 1 : 0;
-    ids.splice(newIndex, 0, targetId);
+    projectIds.splice(targetProject.index, 1);
+    let newIndex = 0;
+    if (afterProject) {
+      if (targetProject.index < afterProject.index)
+        newIndex = afterProject.index;
+      else newIndex = afterProject.index + 1;
+    }
+    projectIds.splice(newIndex, 0, targetId);
 
-    const query = `
-        UPDATE projects AS p
+    await client.query(
+      `
+        UPDATE ${DB_PROJECTS} AS p
         SET sort_order = ordered.position
         FROM unnest($1::int[]) WITH ORDINALITY
           AS ordered(id, position)
         WHERE p.id = ordered.id
-      `;
-    const values = [ids];
-
-    await client.query(query, values);
+      `,
+      [projectIds],
+    );
 
     await client.query("COMMIT");
   } catch (error) {
-    await client.query("ROLLBACK");
+    await client.query("ROLLBACK").catch((error) => {
+      console.error(error);
+    });
     throw error;
   } finally {
     client.release();

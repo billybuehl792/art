@@ -46,6 +46,14 @@ projectsRouter.post("/", async (req: Request, res: Response) => {
   res.status(201).json(project);
 });
 
+projectsRouter.patch("/reorder", async (req: Request, res: Response) => {
+  const body = projectListReorderSchema.parse(req.body);
+
+  await reorderProject(body);
+
+  res.sendStatus(204);
+});
+
 projectsRouter.get("/:id", async (req: Request, res: Response) => {
   const projectId = idSchema.parse(req.params.id);
 
@@ -67,13 +75,6 @@ projectsRouter.patch("/:id", async (req: Request, res: Response) => {
 projectsRouter.delete("/:id", async (req: Request, res: Response) => {
   const id = idSchema.parse(req.params.id);
   await deleteProject(id);
-
-  res.sendStatus(204);
-});
-
-projectsRouter.patch("/reorder", async (req: Request, res: Response) => {
-  const body = projectListReorderSchema.parse(req.body);
-  await reorderProject(body);
 
   res.sendStatus(204);
 });
