@@ -17,30 +17,29 @@ import {
 } from "@mui/material";
 import useConfirm from "@/hooks/useConfirm";
 import FileUploadField from "@/components/fields/FileUploadField";
+import ExternalLinkField from "@/components/fields/ExternalLinkField";
 import { projectCategoryEnum } from "@/schemas/projects";
 
 type ProjectFormValues = z.infer<typeof projectFormSchema>;
 
 const projectFormSchema = z.object({
+  category: projectCategoryEnum,
   title: z.string().trim().min(1),
   subtitle: z.string(),
   description: z.string(),
-  category: projectCategoryEnum,
-  link: z.string().nullable(),
+  link: z.url().nullable(),
   media: z.custom<File>((value) => value instanceof File).nullable(),
-  priority: z.number().nonnegative(),
-  sortOrder: z.number().nonnegative(),
+  priority: z.number().min(0).max(10),
 });
 
 const DEFAULT_VALUES: ProjectFormValues = {
+  category: "art",
   title: "",
   subtitle: "",
   description: "",
-  category: "art",
-  media: null,
   link: null,
-  priority: 1,
-  sortOrder: 0,
+  media: null,
+  priority: 0,
 };
 
 export interface ProjectFormProps extends Omit<
@@ -116,51 +115,6 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         >
           {({ disabled }) => (
             <Stack spacing={2}>
-              <form.Field
-                name="title"
-                children={({ state, handleBlur, handleChange }) => (
-                  <TextField
-                    label="Title"
-                    value={state.value}
-                    disabled={disabled}
-                    error={!state.meta.isValid}
-                    helperText={state.meta.errors[0]?.message}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                  />
-                )}
-              />
-
-              <form.Field name="subtitle">
-                {({ state, handleBlur, handleChange }) => (
-                  <TextField
-                    label="Subtitle"
-                    value={state.value}
-                    disabled={disabled}
-                    error={state.meta.isTouched && !state.meta.isValid}
-                    helperText={state.meta.errors[0]?.message}
-                    onChange={(e) => handleChange(e.target.value)}
-                    onBlur={handleBlur}
-                  />
-                )}
-              </form.Field>
-
-              <form.Field name="description">
-                {(field) => (
-                  <TextField
-                    label="Description"
-                    multiline
-                    rows={3}
-                    value={field.state.value}
-                    disabled={disabled}
-                    error={!field.state.meta.isValid}
-                    helperText={field.state.meta.errors[0]?.message}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                )}
-              </form.Field>
-
               <form.Field name="category">
                 {(field) => (
                   <FormControl>
@@ -187,6 +141,70 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                       ))}
                     </RadioGroup>
                   </FormControl>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="title"
+                children={({ state, handleBlur, handleChange }) => (
+                  <TextField
+                    label="Title"
+                    placeholder="Project Title"
+                    value={state.value}
+                    disabled={disabled}
+                    error={!state.meta.isValid}
+                    helperText={state.meta.errors[0]?.message}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                  />
+                )}
+              />
+
+              <form.Field
+                name="subtitle"
+                children={({ state, handleBlur, handleChange }) => (
+                  <TextField
+                    label="Subtitle"
+                    placeholder="Project Subtitle"
+                    value={state.value}
+                    disabled={disabled}
+                    error={state.meta.isTouched && !state.meta.isValid}
+                    helperText={state.meta.errors[0]?.message}
+                    onChange={(e) => handleChange(e.target.value)}
+                    onBlur={handleBlur}
+                  />
+                )}
+              />
+
+              <form.Field
+                name="description"
+                children={(field) => (
+                  <TextField
+                    label="Description"
+                    placeholder="Project Description"
+                    multiline
+                    rows={3}
+                    value={field.state.value}
+                    disabled={disabled}
+                    error={!field.state.meta.isValid}
+                    helperText={field.state.meta.errors[0]?.message}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                )}
+              />
+
+              <form.Field name="link">
+                {(field) => (
+                  <ExternalLinkField
+                    label="Link"
+                    value={field.state.value || ""}
+                    disabled={disabled}
+                    error={!field.state.meta.isValid}
+                    helperText={field.state.meta.errors[0]?.message}
+                    onChange={(e) => field.handleChange(e.target.value || null)}
+                    onBlur={field.handleBlur}
+                  />
                 )}
               </form.Field>
 
@@ -217,6 +235,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
                     helperText={field.state.meta.errors[0]?.message}
                     onChange={(e) => field.handleChange(Number(e.target.value))}
                     onBlur={field.handleBlur}
+                    slotProps={{
+                      htmlInput: { min: 1, max: 10, step: 1 },
+                    }}
                   />
                 )}
               </form.Field>
