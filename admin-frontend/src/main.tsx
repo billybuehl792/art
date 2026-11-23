@@ -12,11 +12,13 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
+import { SnackbarProvider } from "notistack";
 import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./config/theme";
 import LoadingScreen from "./components/layout/LoadingScreen";
 import ErrorScreen from "./components/layout/ErrorScreen";
 import ConfirmProvider from "./providers/ConfirmProvider";
+import Snackbar from "./components/layout/Snackbar";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -43,12 +45,25 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <ThemeProvider theme={createAppTheme()} defaultMode="dark">
-        <QueryClientProvider client={queryClient}>
-          <ConfirmProvider>
-            <CssBaseline />
-            <RouterProvider router={router} />
-          </ConfirmProvider>
-        </QueryClientProvider>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          variant="success"
+          Components={{
+            default: Snackbar,
+            error: Snackbar,
+            success: Snackbar,
+            warning: Snackbar,
+            info: Snackbar,
+          }}
+        >
+          <QueryClientProvider client={queryClient}>
+            <ConfirmProvider>
+              <CssBaseline />
+              <RouterProvider router={router} />
+            </ConfirmProvider>
+          </QueryClientProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </StrictMode>,
   );

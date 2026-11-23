@@ -8,6 +8,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
 import { Container, Typography } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -43,6 +44,7 @@ function RouteComponent() {
   const params = Route.useSearch();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const snackbar = useSnackbar();
 
   const { category, search } = params;
   const isSortable = !!category && !search;
@@ -87,7 +89,16 @@ function RouteComponent() {
       confirmButton: { children: "Delete", color: "error" },
       cancelButton: { color: "primary" },
     }).then((confirmed) => {
-      if (confirmed) projectDeleteMutation.mutate(project.id);
+      if (confirmed)
+        projectDeleteMutation.mutate(project.id, {
+          onSuccess: () =>
+            snackbar.enqueueSnackbar(`Deleted Project: "${project.title}"`),
+          onError: () =>
+            snackbar.enqueueSnackbar({
+              message: `Error while deleting project:  "${project.title}"`,
+              variant: "error",
+            }),
+        });
     });
 
   const handleOnSort: ProjectListProps["onSort"] = async ({
@@ -102,10 +113,13 @@ function RouteComponent() {
     const sortedProjects = reorderInfiniteData(projectListQuery.data, sorted);
     queryClient.setQueryData(projectListQueryOptions.queryKey, sortedProjects);
 
-    await projectListReorderMutation.mutateAsync({
-      targetId,
-      afterId,
-      category,
+    const body = { targetId, afterId, category };
+    await projectListReorderMutation.mutateAsync(body, {
+      onSettled: (_, error) =>
+        snackbar.enqueueSnackbar({
+          message: "Projects reordered",
+          variant: error ? "error" : "success",
+        }),
     });
   };
 

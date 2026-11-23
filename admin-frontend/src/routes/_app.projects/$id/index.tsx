@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
 import {
   Breadcrumbs,
   Card,
@@ -38,6 +39,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const project = Route.useLoaderData();
   const confirm = useConfirm();
+  const snackbar = useSnackbar();
 
   /** Mutations */
 
@@ -60,7 +62,15 @@ function RouteComponent() {
     }).then((confirmed) => {
       if (confirmed)
         projectDeleteMutation.mutate(undefined, {
-          onSuccess: () => navigate({ to: "/projects" }),
+          onSuccess: () => {
+            snackbar.enqueueSnackbar(`Deleted Project: "${project.title}"`);
+            navigate({ to: "/projects" });
+          },
+          onError: () =>
+            snackbar.enqueueSnackbar({
+              message: `Error while deleting project: "${project.title}"`,
+              variant: "error",
+            }),
         });
     });
 

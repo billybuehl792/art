@@ -4,6 +4,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
 import {
   Breadcrumbs,
   Card,
@@ -21,7 +22,6 @@ import { projectQueries } from "@/queries/projects";
 import { uploadQueries } from "@/queries/uploads";
 import { uploadCreateSchema } from "@/schemas/uploads";
 import { projectCreateSchema } from "@/schemas/projects";
-import type { UploadResponse } from "@/types/uploads";
 import type { Project } from "@/types/projects";
 
 export const Route = createFileRoute("/_app/projects/create")({
@@ -34,6 +34,7 @@ function RouteComponent() {
   const router = useRouter();
   const navigate = Route.useNavigate();
   const canGoBack = useCanGoBack();
+  const snackbar = useSnackbar();
 
   /** Mutations */
 
@@ -54,22 +55,42 @@ function RouteComponent() {
       ignoreBlocker: true,
     });
 
+  const handleFileUpload = async (file: File | null) => {
+    if (!file) return undefined;
+
+    const uploadResponse = await uploadCreateMutation.mutateAsync(
+      uploadCreateSchema.parse({ file }),
+      {
+        onSettled: (_, error) =>
+          snackbar.enqueueSnackbar({
+            message: "File uploaded",
+            variant: error ? "error" : "success",
+          }),
+      },
+    );
+
+    return uploadResponse.data;
+  };
+
   const handleCreateProject: ProjectFormProps["onSubmit"] = async ({
     media,
     ...data
   }) => {
-    let mediaBody: UploadResponse | undefined;
-
-    if (media) {
-      const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
-        uploadCreateSchema.parse({ file: media }),
-      );
-      mediaBody = mediaUploadResponse.data;
-    }
+    const mediaBody = await handleFileUpload(media);
 
     await projectCreateMutation.mutateAsync(
       projectCreateSchema.parse({ ...data, ...mediaBody }),
-      { onSuccess: ({ data }) => handleNavigateProject(data) },
+      {
+        onSuccess: ({ data }) => {
+          snackbar.enqueueSnackbar(`Created Project: "${data.title}"`);
+          handleNavigateProject(data);
+        },
+        onError: () =>
+          snackbar.enqueueSnackbar({
+            message: "Error while creating project",
+            variant: "error",
+          }),
+      },
     );
   };
 

@@ -5,6 +5,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
+import { useSnackbar } from "notistack";
 import {
   Breadcrumbs,
   Card,
@@ -28,7 +29,7 @@ import { isSameFile, urlToFile } from "@/utils/files";
 import { projectQueries } from "@/queries/projects";
 import { uploadQueries } from "@/queries/uploads";
 import type { MenuOption } from "@/types/basic";
-import type { Project, ProjectUpdate } from "@/types/projects";
+import type { Project } from "@/types/projects";
 
 export const Route = createFileRoute("/_app/projects/$id/edit")({
   component: RouteComponent,
@@ -59,6 +60,7 @@ function RouteComponent() {
   const loaderData = Route.useLoaderData();
   const canGoBack = useCanGoBack();
   const confirm = useConfirm();
+  const snackbar = useSnackbar();
 
   const project = loaderData.project;
 
@@ -86,31 +88,43 @@ function RouteComponent() {
       ignoreBlocker: true,
     });
 
+  const handleFileUpload = async (file: File | null) => {
+    if (!file) return { mediaType: null, mediaUrl: null, thumbnailUrl: null };
+    if (project.media && isSameFile(file, project.media)) return undefined;
+
+    const uploadResponse = await uploadCreateMutation.mutateAsync(
+      uploadCreateSchema.parse({ file }),
+      {
+        onSettled: (_, error) =>
+          snackbar.enqueueSnackbar({
+            message: "File uploaded",
+            variant: error ? "error" : "success",
+          }),
+      },
+    );
+
+    return uploadResponse.data;
+  };
+
   const handleProjectUpdate: ProjectFormProps["onSubmit"] = async ({
     media,
-    ...data
+    ...body
   }) => {
-    let mediaBody:
-      | Pick<ProjectUpdate, "mediaType" | "mediaUrl" | "thumbnailUrl">
-      | undefined;
-
-    if (media) {
-      const isSameMediaFile =
-        !!project.media && isSameFile(media, project.media);
-
-      if (!isSameMediaFile) {
-        const mediaUploadResponse = await uploadCreateMutation.mutateAsync(
-          uploadCreateSchema.parse({ file: media }),
-        );
-        mediaBody = mediaUploadResponse.data;
-      }
-    } else {
-      mediaBody = { mediaType: null, mediaUrl: null, thumbnailUrl: null };
-    }
+    const mediaBody = await handleFileUpload(media);
 
     await projectUpdateMutation.mutateAsync(
-      projectUpdateSchema.parse({ ...data, ...mediaBody }),
-      { onSuccess: (res) => handleProjectNavigate(res.data) },
+      projectUpdateSchema.parse({ ...body, ...mediaBody }),
+      {
+        onError: () =>
+          snackbar.enqueueSnackbar({
+            message: `Failed to updated ${project.title}`,
+            variant: "error",
+          }),
+        onSuccess: ({ data }) => {
+          snackbar.enqueueSnackbar(`Updated ${data.title} successfully`);
+          handleProjectNavigate(data);
+        },
+      },
     );
   };
 
@@ -124,7 +138,15 @@ function RouteComponent() {
     }).then((confirmed) => {
       if (confirmed)
         projectDeleteMutation.mutate(undefined, {
-          onSuccess: () => navigate({ to: "/projects" }),
+          onSuccess: () => {
+            snackbar.enqueueSnackbar(`Deleted Project: "${project.title}"`);
+            navigate({ to: "/projects" });
+          },
+          onError: () =>
+            snackbar.enqueueSnackbar({
+              message: `Error while deleting project: "${project.title}"`,
+              variant: "error",
+            }),
         });
     });
 
