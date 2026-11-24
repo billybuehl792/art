@@ -1,11 +1,13 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import {
+  Box,
   ButtonBase,
   ImageListItem,
   ImageListItemBar,
   type ImageListItemProps,
 } from "@mui/material";
+import { ImageOutlined as ImageOutlinedIcon } from "@mui/icons-material";
 import type { Project } from "@/types/projects";
 
 export interface ProjectGridItemProps extends Omit<
@@ -13,6 +15,7 @@ export interface ProjectGridItemProps extends Omit<
   "children" | "onClick"
 > {
   project: Project;
+  disabled?: boolean;
   onClick?: (project: Project) => void;
 }
 
@@ -23,6 +26,22 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => {
 
   return {
     aspectRatio: "1 / 1",
+
+    "& .MuiButtonBase-root": {
+      position: "relative",
+      width: "100%",
+      height: "100%",
+    },
+    "& img": { width: "100%", height: "100%", objectFit: "cover" },
+    "& .MuiImageListItem-placeholder": {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.palette.action.hover,
+      color: theme.palette.text.disabled,
+    },
     "& .MuiImageListItemBar-root": {
       top: 0,
       textAlign: "center",
@@ -65,38 +84,44 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => {
   };
 });
 
-const srcset = (image: string, size = 1, rows = 1, cols = 1) => ({
-  src: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-  srcSet: `${image}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format&dpr=2 2x`,
+const srcset = (image: string, size = 300) => ({
+  src: `${image}?w=${size}&h=${size}&fit=crop&auto=format`,
+  srcSet: `${image}?w=${size * 2}&h=${size * 2}&fit=crop&auto=format 2x`,
 });
 
 const ProjectGridItem: React.FC<ProjectGridItemProps> = ({
   project,
+  disabled,
   onClick,
   ...props
 }) => {
-  const Content = (
+  /** Callbacks */
+
+  const renderContent = () => (
     <>
       <ImageListItemBar title={project.title} subtitle={project.subtitle} />
-      <img
-        {...srcset(project.mediaUrl ?? "")}
-        alt={project.title}
-        loading="lazy"
-        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-      />
+      {project.thumbnailUrl ? (
+        <img
+          alt={project.title}
+          {...srcset(project.thumbnailUrl)}
+          loading="lazy"
+        />
+      ) : (
+        <Box className="MuiImageListItem-placeholder">
+          <ImageOutlinedIcon fontSize="large" />
+        </Box>
+      )}
     </>
   );
+
   return (
     <StyledImageListItem {...props}>
       {onClick ? (
-        <ButtonBase
-          onClick={() => onClick(project)}
-          sx={{ position: "relative", width: "100%", height: "100%" }}
-        >
-          {Content}
+        <ButtonBase disabled={disabled} onClick={() => onClick(project)}>
+          {renderContent()}
         </ButtonBase>
       ) : (
-        Content
+        renderContent()
       )}
     </StyledImageListItem>
   );

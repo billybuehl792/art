@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import app from "./app";
 import fs from "node:fs/promises";
-import { checkDbConnection } from "./db/utils";
+import { checkDbConnection } from "./db";
 import { UPLOAD_DIR, UPLOAD_THUMBNAIL_DIR } from "./constants/uploads";
 
 const start = async () => {

@@ -1,9 +1,8 @@
 import express from "express";
 import cors from "cors";
 import projectsRouter from "./routes/projects";
-import upload from "./routes/upload";
-import { errorHandler } from "./utils/error";
-import { UPLOAD_DIR } from "./constants/upload";
+import { errorHandler } from "./utils/errors";
+import { UPLOAD_DIR } from "./constants/uploads";
 
 const app = express();
 
@@ -15,8 +14,6 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/projects", projectsRouter);
-app.use("/api/upload", upload);
-
 app.use("/uploads", express.static(UPLOAD_DIR));
 
 app.use(errorHandler);

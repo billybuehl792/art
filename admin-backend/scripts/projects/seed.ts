@@ -1,8 +1,8 @@
 import "dotenv/config";
 
 import { pathToFileURL } from "node:url";
-import pool from "../../src/db/pool";
-import { createProject } from "../../src/db/queries/projects";
+import pool from "../../src/db";
+import { createProject } from "../../src/queries/projects";
 import { projectCreateSchema } from "../../src/schemas/projects";
 
 const createProjects = async (count: number) => {

@@ -1,52 +1,99 @@
 import React from "react";
 import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Typography,
-  type CardProps,
+  Avatar,
+  ListItem,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  Stack,
+  type ListItemProps,
 } from "@mui/material";
+import MenuOptionsIconButton from "@/components/buttons/MenuOptionsIconButton";
+import { sxArray, truncateText } from "@/utils/sx";
 import type { Project } from "@/types/projects";
+import type { MenuOption } from "@/types/basic";
 
-export interface ProjectListItemProps extends CardProps {
+export interface ProjectListItemProps extends Omit<
+  ListItemProps,
+  "id" | "onClick"
+> {
   project: Project;
+  sortIndex?: number;
+  disabled?: boolean;
+  options?: MenuOption[];
+  onClick?: (project: Project) => void;
 }
 
 const ProjectListItem: React.FC<ProjectListItemProps> = ({
   project,
+  disabled,
+  options,
+  onClick,
   ...props
 }) => {
-  return (
-    <Card {...props}>
-      <CardContent>
-        <Typography variant="h2" gutterBottom>
-          {project.title}
-        </Typography>
-        {!!project.subtitle && (
-          <Typography variant="h4" gutterBottom>
-            {project.subtitle}
-          </Typography>
-        )}
-        {!!project.description && (
-          <Typography variant="caption">{project.description}</Typography>
-        )}
-      </CardContent>
-      {!!project.link && (
-        <CardActions>
-          <Button
-            component="a"
-            size="small"
-            target="_blank"
-            rel="noopener noreferrer"
-            color="primary"
-            href={project.link}
-          >
-            View Project
-          </Button>
-        </CardActions>
+  /** Callbacks */
+
+  const renderBody = () => (
+    <>
+      {!!project.thumbnailUrl && (
+        <ListItemAvatar>
+          <Avatar
+            variant="rounded"
+            alt={project.title}
+            src={project.thumbnailUrl}
+          />
+        </ListItemAvatar>
       )}
-    </Card>
+      <ListItemText
+        primary={project.title}
+        secondary={project.subtitle}
+        sx={truncateText}
+      />
+    </>
+  );
+
+  return (
+    <ListItem
+      {...props}
+      sx={sxArray(
+        {
+          position: "relative",
+          border: `1px solid`,
+          borderColor: "divider",
+          borderRadius: 1,
+        },
+        props?.sx,
+      )}
+    >
+      {onClick ? (
+        <ListItemButton
+          disabled={disabled}
+          onClick={() => onClick(project)}
+          sx={{ borderRadius: "inherit" }}
+        >
+          {renderBody()}
+        </ListItemButton>
+      ) : (
+        renderBody()
+      )}
+      {!!options?.length && (
+        <Stack
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 0,
+            bottom: 0,
+            justifyContent: "center",
+          }}
+        >
+          <MenuOptionsIconButton
+            options={options}
+            size="small"
+            disabled={disabled}
+          />
+        </Stack>
+      )}
+    </ListItem>
   );
 };
 

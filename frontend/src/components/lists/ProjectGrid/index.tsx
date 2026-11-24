@@ -2,67 +2,63 @@ import React from "react";
 import {
   Button,
   ImageList,
+  ImageListItem,
+  Skeleton,
+  Stack,
   useMediaQuery,
-  type ImageListProps,
+  type StackProps,
 } from "@mui/material";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import ProjectGridItem, { type ProjectGridItemProps } from "./ProjectGridItem";
-import ProjectGridSkeletonItem from "./ProjectGridSkeletonItem";
-import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
 import StatusCard from "@/components/cards/StatusCard";
-import { sxArray } from "@/utils/sx";
-import { DEFAULT_LIMIT } from "@/constants";
 import type { Project } from "@/types/projects";
 
-export interface ProjectGridProps extends Omit<ImageListProps, "children"> {
+export interface ProjectGridProps extends Omit<StackProps, "children"> {
   projects: Project[];
+  disabled?: boolean;
   loading?: boolean;
   error?: Error | null;
-  hasNextPage: boolean;
-  isRefetching?: boolean;
-  isFetchingNextPage: boolean;
-  onProjectClick?: ProjectGridItemProps["onClick"];
-  onFetchNextPage: VoidFunction;
-  onRetry?: VoidFunction;
+  hasMore: boolean;
+  onLoadMore: VoidFunction;
+  onRefetch?: VoidFunction;
   slotProps?: {
-    item?: Partial<Omit<ProjectGridItemProps, "project">>;
+    card?: (project: Project) => Partial<Omit<ProjectGridItemProps, "project">>;
   };
 }
 
 const ProjectGrid: React.FC<ProjectGridProps> = ({
   projects,
+  disabled,
   loading,
   error,
-  hasNextPage,
-  isRefetching,
-  isFetchingNextPage,
-  onProjectClick,
-  onFetchNextPage,
-  onRetry,
+  hasMore,
+  onLoadMore,
+  onRefetch,
   slotProps,
   ...props
 }) => {
   /** Values */
 
+  const scrollRef = useInfiniteScroll({ disabled: loading, onLoadMore });
+
   const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const isMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
 
-  const isError = !!error;
-  const isEmpty = !loading && !isFetchingNextPage && projects.length <= 0;
+  const isEmpty = !loading && !error && projects.length < 1;
+  const showSkeletons = !!loading && (hasMore || !projects.length);
 
-  const renderError = () => (
-    <StatusCard
-      status="error"
-      message={error?.message}
-      {...(!!onRetry && {
-        action: (
-          <Button variant="contained" loading={isRefetching} onClick={onRetry}>
-            Try again
-          </Button>
-        ),
-      })}
-      sx={{ mt: 2 }}
-    />
-  );
+  /** Callbacks */
+
+  const renderProjects = (options?: { sortable?: boolean }) =>
+    projects.map((project, index) => (
+      <ProjectGridItem
+        key={project.id}
+        project={project}
+        disabled={loading || disabled}
+        {...(!!options?.sortable && { sortIndex: index })}
+        {...slotProps?.card?.(project)}
+      />
+    ));
 
   const renderEmpty = () => (
     <StatusCard
@@ -73,35 +69,49 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
     />
   );
 
-  if (isError) return renderError();
-  if (isEmpty) return renderEmpty();
+  const renderError = (error: Error) => (
+    <StatusCard
+      status="error"
+      message={error.message}
+      action={
+        <Button variant="contained" loading={loading} onClick={onRefetch}>
+          Try again
+        </Button>
+      }
+      sx={{ mt: 2 }}
+    />
+  );
+
   return (
-    <ImageList
-      cols={isSm ? 1 : isMd ? 2 : 3}
-      gap={1}
-      {...props}
-      sx={sxArray({ overflow: "visible" }, props?.sx)}
-    >
-      {projects.map((project) => (
-        <ProjectGridItem
-          key={project.id}
-          project={project}
-          onClick={onProjectClick}
-          {...slotProps?.item}
-        />
-      ))}
-      <InfiniteScrollTrigger
-        isFetchingNextPage={isFetchingNextPage}
-        hasNextPage={hasNextPage}
-        fetchNextPage={onFetchNextPage}
-      >
-        <ProjectGridSkeletonItem />
-      </InfiniteScrollTrigger>
-      {(!!loading || isFetchingNextPage) &&
-        Array.from({ length: DEFAULT_LIMIT - 1 }).map((_, index) => (
-          <ProjectGridSkeletonItem key={`skeleton-${index}`} />
-        ))}
-    </ImageList>
+    <Stack {...props}>
+      {error ? (
+        renderError(error)
+      ) : isEmpty ? (
+        renderEmpty()
+      ) : (
+        <ImageList
+          cols={isSm ? 1 : isMd ? 2 : 3}
+          gap={1}
+          sx={{ overflow: "visible" }}
+        >
+          {renderProjects()}
+          {showSkeletons &&
+            Array.from({ length: 20 }).map((_, index) => (
+              <ImageListItem
+                key={`skeleton-${index}`}
+                sx={{ aspectRatio: "1 / 1" }}
+              >
+                <Skeleton
+                  variant="rectangular"
+                  animation="wave"
+                  sx={{ width: "100%", height: "100%" }}
+                />
+              </ImageListItem>
+            ))}
+          {hasMore && <div ref={scrollRef} />}
+        </ImageList>
+      )}
+    </Stack>
   );
 };
 

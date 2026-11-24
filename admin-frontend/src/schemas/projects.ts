@@ -13,8 +13,8 @@ export const projectSchema = z.object({
   mediaType: z.string().nullable(),
   mediaUrl: z.string().nullable(),
   thumbnailUrl: z.string().nullable(),
-  priority: z.number().nonnegative(),
-  sortOrder: z.number().nonnegative(),
+  priority: z.coerce.number().int().min(0),
+  sortOrder: z.coerce.number().int().min(0),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });

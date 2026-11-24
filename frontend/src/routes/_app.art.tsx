@@ -2,14 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Container, useMediaQuery } from "@mui/material";
+import { Download as DownloadIcon } from "@mui/icons-material";
 import PageHeader from "@/components/layout/PageHeader";
 import ProjectDialog from "@/components/modals/ProjectDialog";
-import ProjectGrid, {
-  type ProjectGridProps,
-} from "@/components/lists/ProjectGrid";
-import { apiQueries } from "@/queries";
+import ProjectGrid from "@/components/lists/ProjectGrid";
 import { idSchema } from "@/schemas/basic";
-import { projectListRequestParamsSchema } from "@/schemas/projects";
+import { projectQueries } from "@/queries/projects";
+import { projectListRequestSchema } from "@/schemas/projects";
+import { downloadFile } from "@/utils/files";
+import type { Project } from "@/types/projects";
+import type { MenuOption } from "@/types/basic";
 
 const category = "art";
 const validateSearch = z.object({ project: idSchema.optional() });
@@ -30,20 +32,23 @@ function RouteComponent() {
   /** Queries */
 
   const projectListQuery = useInfiniteQuery(
-    apiQueries.projects.get(projectListRequestParamsSchema.parse({ category })),
+    projectQueries.projects.get(
+      projectListRequestSchema.parse({ params: { category } }),
+    ),
   );
 
   /** Data */
 
   const projects =
     projectListQuery.data?.pages.flatMap((page) => page.data.results) ?? [];
+
   const selectedProject = selectedProjectId
     ? (projects.find(({ id }) => id === selectedProjectId) ?? selectedProjectId)
     : null;
 
   /** Callbacks */
 
-  const handleProjectOnClick: ProjectGridProps["onProjectClick"] = (project) =>
+  const handleProjectOnClick = (project: Project) =>
     navigate({
       search: (prev) => ({ ...prev, project: String(project.id) }),
       resetScroll: false,
@@ -52,23 +57,37 @@ function RouteComponent() {
   const handleProjectOnClose = () =>
     navigate({ search: ({ project: _, ...prev }) => prev, resetScroll: false });
 
+  const getProjectOptions = (project: Project): MenuOption[] => [
+    {
+      id: "download",
+      render: !!project.mediaUrl,
+      title: "Download",
+      Icon: DownloadIcon,
+      onClick: () => {
+        if (project.mediaUrl) downloadFile(project.mediaUrl, project.title);
+      },
+    },
+  ];
+
   return (
     <Container disableGutters={isSm}>
       <PageHeader title="Art" sx={{ px: isSm ? 1 : 0 }} />
       <ProjectGrid
         projects={projects}
-        loading={projectListQuery.isLoading}
+        hasMore={projectListQuery.hasNextPage}
+        loading={projectListQuery.isFetching}
         error={projectListQuery.error}
-        hasNextPage={projectListQuery.hasNextPage}
-        isFetchingNextPage={projectListQuery.isFetchingNextPage}
-        isRefetching={projectListQuery.isRefetching}
-        onProjectClick={handleProjectOnClick}
-        onFetchNextPage={projectListQuery.fetchNextPage}
-        onRetry={projectListQuery.refetch}
+        onLoadMore={projectListQuery.fetchNextPage}
+        onRefetch={projectListQuery.refetch}
+        sx={{ my: 2 }}
+        slotProps={{
+          card: (project) => ({ onClick: () => handleProjectOnClick(project) }),
+        }}
       />
       <ProjectDialog
         open={!!selectedProject}
         project={selectedProject}
+        options={selectedProject ? getProjectOptions : undefined}
         onClose={handleProjectOnClose}
       />
     </Container>

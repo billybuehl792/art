@@ -3,8 +3,8 @@ import "dotenv/config";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import pool from "../../src/db/pool";
-import { deleteAllProjects } from "../../src/db/queries/projects";
+import pool from "../../src/db";
+import { deleteAllProjects } from "../../src/queries/projects";
 import { UPLOAD_DIR, UPLOAD_THUMBNAIL_DIR } from "../../src/constants/uploads";
 
 const clearDirectory = async (dir: string) => {

@@ -3,10 +3,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Container, useMediaQuery } from "@mui/material";
 import PageHeader from "@/components/layout/PageHeader";
 import ProjectList from "@/components/lists/ProjectList";
-import { apiQueries } from "@/queries";
-import { projectListRequestParamsSchema } from "@/schemas/projects";
+import { projectQueries } from "@/queries/projects";
+import { projectListRequestSchema } from "@/schemas/projects";
+import type { Project } from "@/types/projects";
 
-const category = "dev";
+const category: Project["category"] = "dev";
 
 export const Route = createFileRoute("/_app/dev")({
   component: RouteComponent,
@@ -20,7 +21,9 @@ function RouteComponent() {
   /** Queries */
 
   const projectListQuery = useInfiniteQuery(
-    apiQueries.projects.get(projectListRequestParamsSchema.parse({ category })),
+    projectQueries.projects.get(
+      projectListRequestSchema.parse({ params: { category } }),
+    ),
   );
 
   /** Data */
@@ -33,13 +36,11 @@ function RouteComponent() {
       <PageHeader title="Dev" sx={{ px: isSm ? 1 : 0 }} />
       <ProjectList
         projects={projects}
-        loading={projectListQuery.isLoading}
+        hasMore={projectListQuery.hasNextPage}
+        loading={projectListQuery.isFetching}
         error={projectListQuery.error}
-        hasNextPage={projectListQuery.hasNextPage}
-        isFetchingNextPage={projectListQuery.isFetchingNextPage}
-        isRefetching={projectListQuery.isRefetching}
-        onFetchNextPage={projectListQuery.fetchNextPage}
-        onRetry={projectListQuery.refetch}
+        onLoadMore={projectListQuery.fetchNextPage}
+        onRefetch={projectListQuery.refetch}
         sx={{ my: 2 }}
       />
     </Container>

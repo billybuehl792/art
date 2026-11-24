@@ -1,61 +1,58 @@
 import React from "react";
-import { Button, Stack, type StackProps } from "@mui/material";
-import ProjectListItem, { type ProjectListItemProps } from "./ProjectListItem";
-import InfiniteScrollTrigger from "@/components/layout/InfiniteScrollTrigger";
-import ProjectListItemSkeleton from "./ProjectListItemSkeleton";
-import { DEFAULT_LIMIT } from "@/constants";
-import type { Project } from "@/types/projects";
+import {
+  Button,
+  MenuList,
+  Skeleton,
+  Stack,
+  type StackProps,
+} from "@mui/material";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import StatusCard from "@/components/cards/StatusCard";
+import ProjectListItem, { type ProjectListItemProps } from "./ProjectListItem";
+import type { Project } from "@/types/projects";
 
 export interface ProjectListProps extends StackProps {
   projects: Project[];
+  disabled?: boolean;
   loading?: boolean;
   error?: Error | null;
-  hasNextPage: boolean;
-  isRefetching?: boolean;
-  isFetchingNextPage: boolean;
-  onProjectClick?: ProjectListItemProps["onClick"];
-  onFetchNextPage: VoidFunction;
-  onRetry?: VoidFunction;
+  hasMore: boolean;
+  onLoadMore: VoidFunction;
+  onRefetch?: VoidFunction;
   slotProps?: {
-    item?: Partial<Omit<ProjectListItemProps, "project">>;
+    card?: (project: Project) => Partial<Omit<ProjectListItemProps, "project">>;
   };
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({
   projects,
+  disabled,
   loading,
   error,
-  hasNextPage,
-  isRefetching,
-  isFetchingNextPage,
-  onFetchNextPage,
-  onProjectClick,
-  onRetry,
+  hasMore,
+  onLoadMore,
+  onRefetch,
   slotProps,
   ...props
 }) => {
   /** Values */
 
-  const isError = !!error;
-  const isEmpty = !loading && !isFetchingNextPage && projects.length <= 0;
+  const scrollRef = useInfiniteScroll({ disabled: loading, onLoadMore });
+
+  const isEmpty = !loading && !error && projects.length < 1;
 
   /** Callbacks */
 
-  const renderError = () => (
-    <StatusCard
-      status="error"
-      message={error?.message}
-      {...(!!onRetry && {
-        action: (
-          <Button variant="contained" loading={isRefetching} onClick={onRetry}>
-            Try again
-          </Button>
-        ),
-      })}
-      sx={{ mt: 2 }}
-    />
-  );
+  const renderProjects = (options?: { sortable?: boolean }) =>
+    projects.map((project, index) => (
+      <ProjectListItem
+        key={project.id}
+        project={project}
+        disabled={loading || disabled}
+        {...(!!options?.sortable && { sortIndex: index })}
+        {...slotProps?.card?.(project)}
+      />
+    ));
 
   const renderEmpty = () => (
     <StatusCard
@@ -66,29 +63,40 @@ const ProjectList: React.FC<ProjectListProps> = ({
     />
   );
 
-  if (isError) return renderError();
-  if (isEmpty) return renderEmpty();
+  const renderError = (error: Error) => (
+    <StatusCard
+      status="error"
+      message={error.message}
+      action={
+        <Button variant="contained" loading={loading} onClick={onRefetch}>
+          Try again
+        </Button>
+      }
+      sx={{ mt: 2 }}
+    />
+  );
+
   return (
     <Stack spacing={1} {...props}>
-      {projects.map((project) => (
-        <ProjectListItem
-          key={project.id}
-          project={project}
-          onClick={onProjectClick}
-          {...slotProps?.item}
-        />
-      ))}
-      <InfiniteScrollTrigger
-        isFetchingNextPage={isFetchingNextPage}
-        hasNextPage={hasNextPage}
-        fetchNextPage={onFetchNextPage}
-      >
-        <ProjectListItemSkeleton />
-      </InfiniteScrollTrigger>
-      {(!!loading || isFetchingNextPage) &&
-        Array.from({ length: DEFAULT_LIMIT - 1 }).map((_, index) => (
-          <ProjectListItemSkeleton key={`skeleton-${index}`} />
-        ))}
+      {error ? (
+        renderError(error)
+      ) : isEmpty ? (
+        renderEmpty()
+      ) : (
+        <MenuList sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {renderProjects()}
+          {loading &&
+            (hasMore || !projects.length) &&
+            Array.from({ length: 20 }).map((_, index) => (
+              <Skeleton
+                key={`skeleton-${index}`}
+                variant="rounded"
+                sx={{ mt: 0.5, height: 72 }}
+              />
+            ))}
+        </MenuList>
+      )}
+      {hasMore && <div ref={scrollRef} />}
     </Stack>
   );
 };

@@ -5,6 +5,7 @@ import {
   Instagram as InstagramIcon,
   LinkedIn as LinkedInIcon,
 } from "@mui/icons-material";
+import SocialIconButton from "../buttons/SocialIconButton";
 import ArtStationIcon from "../icons/ArtStationIcon";
 import {
   ARTSTATION_URL,
@@ -12,7 +13,6 @@ import {
   INSTAGRAM_URL,
   LINKEDIN_URL,
 } from "../../constants";
-import SocialIconButton from "../buttons/SocialIconButton";
 
 const SocialList: React.FC<StackProps> = (props) => {
   return (
