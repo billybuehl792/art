@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState, type ReactElement } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Box,
   Dialog,
   DialogContent,
   Skeleton,
-  styled,
+  Slide,
+  Stack,
   type DialogProps,
 } from "@mui/material";
 import DialogHeader from "../layout/DialogHeader";
@@ -14,36 +15,18 @@ import MenuOptionsIconButton from "../buttons/MenuOptionsIconButton";
 import { projectQueries } from "@/queries/projects";
 import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
+import type { TransitionProps } from "@mui/material/transitions";
 
 interface ProjectDialogProps extends Omit<DialogProps, "onClose"> {
   project: Project | Project["id"] | null;
   options?: MenuOption[] | ((project: Project) => MenuOption[]);
-  onClose: VoidFunction;
+  onClose: VoidFunction | (() => Promise<void>);
 }
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  "& .MuiDialog-paper": {
-    width: "calc(100% - 64px)",
-    height: "calc(100% - 64px)",
-    maxWidth: "none",
-    maxHeight: "none",
-    margin: theme.spacing(4),
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  },
-
-  "& .MuiDialogContent-root": {
-    flex: "1 1 auto",
-    minHeight: 0,
-    minWidth: 0,
-    overflow: "auto",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0,
-  },
-}));
+const Transition = forwardRef<
+  unknown,
+  TransitionProps & { children: ReactElement }
+>((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
 const ProjectDialog: React.FC<ProjectDialogProps> = ({
   open: openProp,
@@ -84,18 +67,19 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
 
   const handleOnClose = () => setClosing(true);
 
-  const handleOnClosed = () => {
+  const handleOnClosed = async () => {
+    await onClose();
     setClosing(false);
-    onClose();
     onTransitionExited?.();
   };
 
   return (
-    <StyledDialog
+    <Dialog
       open={open}
       maxWidth="lg"
       fullWidth
       closeAfterTransition
+      slots={{ transition: Transition }}
       onClose={handleOnClose}
       onTransitionExited={handleOnClosed}
       {...props}
@@ -109,45 +93,55 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
           endContent: <MenuOptionsIconButton options={options} />,
         })}
       />
-      <DialogContent>
-        {projectQuery.isLoading ? (
-          <Skeleton
-            variant="rectangular"
-            sx={{ width: "100%", height: "100%" }}
-          />
-        ) : projectQuery.isError || !project?.mediaUrl ? (
-          <StatusCard
-            status="empty"
-            {...(projectQuery.error && {
-              status: "error",
-              message: projectQuery.error.message,
-            })}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-              height: "100%",
-              border: 0,
-            }}
-          />
-        ) : (
-          <Box
-            component="img"
-            src={project.mediaUrl}
-            loading="lazy"
-            sx={{
-              display: "block",
-              maxWidth: "100%",
-              maxHeight: "100%",
-              width: "auto",
-              height: "auto",
-              objectFit: "contain",
-            }}
-          />
-        )}
+      <DialogContent
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          padding: 0,
+        }}
+      >
+        <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+          {projectQuery.isLoading ? (
+            <Skeleton
+              variant="rectangular"
+              sx={{ width: "100%", height: "100%" }}
+            />
+          ) : projectQuery.isError || !project?.mediaUrl ? (
+            <StatusCard
+              status="empty"
+              {...(projectQuery.error && {
+                status: "error",
+                message: projectQuery.error.message,
+              })}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+                border: 0,
+              }}
+            />
+          ) : (
+            <Box
+              component="img"
+              src={project.mediaUrl}
+              loading="lazy"
+              sx={{
+                display: "block",
+                maxWidth: "100%",
+                maxHeight: "100%",
+                width: "auto",
+                height: "auto",
+                objectFit: "contain",
+                minHeight: 200,
+              }}
+            />
+          )}
+        </Stack>
       </DialogContent>
-    </StyledDialog>
+    </Dialog>
   );
 };
 

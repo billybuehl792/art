@@ -54,7 +54,10 @@ function RouteComponent() {
     });
 
   const handleProjectOnClose = () =>
-    navigate({ search: ({ project: _, ...prev }) => prev, resetScroll: false });
+    navigate({
+      search: ({ project: _, ...prev }) => prev,
+      resetScroll: false,
+    });
 
   const getProjectOptions = (project: Project): MenuOption[] => [
     {
