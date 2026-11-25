@@ -14,10 +14,14 @@ import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./theme";
+import type { Breadcrumb } from "./types/basic";
 
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
+  }
+  interface StaticDataRouteOption {
+    breadcrumb?: Breadcrumb;
   }
 }
 

@@ -41,8 +41,10 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
 
   const scrollRef = useInfiniteScroll({ disabled: loading, onLoadMore });
 
-  const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-  const isMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
+  const isXs = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const isSm = useMediaQuery((theme) => theme.breakpoints.down("md"));
+
+  const cols = isXs ? 1 : isSm ? 2 : 3;
 
   const isEmpty = !loading && !error && projects.length < 1;
   const showSkeletons = !!loading && (hasMore || !projects.length);
@@ -89,11 +91,7 @@ const ProjectGrid: React.FC<ProjectGridProps> = ({
       ) : isEmpty ? (
         renderEmpty()
       ) : (
-        <ImageList
-          cols={isSm ? 1 : isMd ? 2 : 3}
-          gap={1}
-          sx={{ overflow: "visible" }}
-        >
+        <ImageList cols={cols} gap={1} sx={{ overflow: "visible" }}>
           {renderProjects()}
           {showSkeletons &&
             Array.from({ length: 20 }).map((_, index) => (

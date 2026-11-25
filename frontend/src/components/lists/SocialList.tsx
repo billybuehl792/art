@@ -5,7 +5,9 @@ import {
   Instagram as InstagramIcon,
   LinkedIn as LinkedInIcon,
 } from "@mui/icons-material";
-import SocialIconButton from "../buttons/SocialIconButton";
+import SocialIconButton, {
+  type SocialIconButtonProps,
+} from "../buttons/SocialIconButton";
 import ArtStationIcon from "../icons/ArtStationIcon";
 import {
   ARTSTATION_URL,
@@ -14,29 +16,31 @@ import {
   LINKEDIN_URL,
 } from "../../constants";
 
-const SocialList: React.FC<StackProps> = (props) => {
+interface SocialListProps extends StackProps {
+  slotProps?: { iconButton?: Partial<SocialIconButtonProps> };
+}
+
+const SocialList: React.FC<SocialListProps> = ({ slotProps, ...props }) => {
+  /** Values */
+
+  const items = [
+    { label: "GitHub Profile", href: GITHUB_URL, Icon: GitHubIcon },
+    { label: "Instagram Profile", href: INSTAGRAM_URL, Icon: InstagramIcon },
+    { label: "LinkedIn Profile", href: LINKEDIN_URL, Icon: LinkedInIcon },
+    { label: "ArtStation Profile", href: ARTSTATION_URL, Icon: ArtStationIcon },
+  ];
+
   return (
     <Stack direction="row" spacing={0.5} {...props}>
-      <SocialIconButton
-        href={GITHUB_URL}
-        Icon={GitHubIcon}
-        aria-label="GitHub Profile"
-      />
-      <SocialIconButton
-        href={INSTAGRAM_URL}
-        Icon={InstagramIcon}
-        aria-label="Instagram Profile"
-      />
-      <SocialIconButton
-        href={LINKEDIN_URL}
-        Icon={LinkedInIcon}
-        aria-label="LinkedIn Profile"
-      />
-      <SocialIconButton
-        href={ARTSTATION_URL}
-        Icon={ArtStationIcon}
-        aria-label="Artstation Profile"
-      />
+      {items.map((item) => (
+        <SocialIconButton
+          key={item.label}
+          href={item.href}
+          Icon={item.Icon}
+          aria-label={item.label}
+          {...slotProps?.iconButton}
+        />
+      ))}
     </Stack>
   );
 };

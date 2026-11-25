@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Container, useMediaQuery } from "@mui/material";
-import PageHeader from "@/components/layout/PageHeader";
+import { Container } from "@mui/material";
 import ProjectList from "@/components/lists/ProjectList";
 import { projectQueries } from "@/queries/projects";
 import { projectListRequestSchema } from "@/schemas/projects";
@@ -11,13 +10,10 @@ const category: Project["category"] = "dev";
 
 export const Route = createFileRoute("/_app/dev")({
   component: RouteComponent,
+  staticData: { breadcrumb: { label: "dev" } },
 });
 
 function RouteComponent() {
-  /** Values */
-
-  const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-
   /** Queries */
 
   const projectListQuery = useInfiniteQuery(
@@ -33,7 +29,6 @@ function RouteComponent() {
 
   return (
     <Container>
-      <PageHeader title="Dev" sx={{ px: isSm ? 1 : 0 }} />
       <ProjectList
         projects={projects}
         hasMore={projectListQuery.hasNextPage}

@@ -1,11 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Container,
-  Divider,
-  Stack,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Container, Divider, Stack, Typography } from "@mui/material";
 import ProfileImage from "../components/images/ProfileImage";
 
 export const Route = createFileRoute("/_app/")({
@@ -15,16 +9,17 @@ export const Route = createFileRoute("/_app/")({
 function RouteComponent() {
   /** Values */
 
-  const isLg = useMediaQuery((theme) => theme.breakpoints.up("sm"));
-
   return (
     <Container
-      sx={(theme) => ({
+      sx={({ layout }) => ({
         position: "relative",
-        minHeight: `calc(100vh - ${theme.layout.footerHeight}px - ${isLg ? 0 : theme.layout.appBarHeight}px)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        minHeight: {
+          xs: `calc(100vh - ${layout.footerHeight}px - ${layout.appBarHeight}px)`,
+          sm: `calc(100vh - ${layout.footerHeight}px)`,
+        },
       })}
     >
       <Stack spacing={1} sx={{ p: 2 }}>

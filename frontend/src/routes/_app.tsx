@@ -4,19 +4,23 @@ import NavPanel from "../components/layout/NavPanel";
 import { useMediaQuery } from "@mui/material";
 import AppBar from "../components/layout/AppBar";
 import Main from "@/components/layout/Main";
+import { APP_TITLE } from "@/constants";
 
 export const Route = createFileRoute("/_app")({
   component: RouteComponent,
+  staticData: {
+    breadcrumb: { label: APP_TITLE, variant: "h2", color: "primary" },
+  },
 });
 
 function RouteComponent() {
   /** Values */
 
-  const isLg = useMediaQuery((theme) => theme.breakpoints.up("sm"));
+  const isXs = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   return (
     <>
-      {isLg ? <NavPanel /> : <AppBar />}
+      {isXs ? <AppBar /> : <NavPanel />}
       <Main>
         <Outlet />
       </Main>

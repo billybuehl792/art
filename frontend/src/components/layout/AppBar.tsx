@@ -3,7 +3,6 @@ import {
   AppBar as MuiAppBar,
   Toolbar,
   IconButton,
-  Stack,
   type AppBarProps,
 } from "@mui/material";
 import {
@@ -11,9 +10,7 @@ import {
   MenuOpen as MenuOpenIcon,
 } from "@mui/icons-material";
 import NavDrawer from "../modals/NavDrawer";
-import Link from "../links/Link";
-import { APP_TITLE } from "../../constants";
-import { truncateText } from "@/utils/sx";
+import Breadcrumbs from "./Breadcrumbs";
 
 const AppBar: React.FC<AppBarProps> = (props) => {
   /** Values */
@@ -28,12 +25,15 @@ const AppBar: React.FC<AppBarProps> = (props) => {
     <>
       <MuiAppBar position="fixed" color="default" {...props}>
         <Toolbar>
-          <Stack direction="row" sx={{ minWidth: 0, flexGrow: 1 }}>
-            <Link variant="h1" to="/" sx={truncateText}>
-              {APP_TITLE}
-            </Link>
-          </Stack>
-
+          <Breadcrumbs
+            sx={{
+              flexGrow: 1,
+              flexWrap: "nowrap",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
+            }}
+          />
           <IconButton color="primary" onClick={handleToggleMenuOpen}>
             {menuOpen ? <MenuOpenIcon /> : <MenuIcon />}
           </IconButton>

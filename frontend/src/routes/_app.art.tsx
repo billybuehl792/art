@@ -1,9 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Container, useMediaQuery } from "@mui/material";
+import { Container } from "@mui/material";
 import { Download as DownloadIcon } from "@mui/icons-material";
-import PageHeader from "@/components/layout/PageHeader";
 import ProjectDialog from "@/components/modals/ProjectDialog";
 import ProjectGrid from "@/components/lists/ProjectGrid";
 import { idSchema } from "@/schemas/basic";
@@ -13,20 +12,20 @@ import { downloadFile } from "@/utils/files";
 import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
 
-const category = "art";
+const category: Project["category"] = "art";
 const validateSearch = z.object({ project: idSchema.optional() });
 
 export const Route = createFileRoute("/_app/art")({
   component: RouteComponent,
   validateSearch,
+  staticData: { breadcrumb: { label: "art" } },
 });
 
 function RouteComponent() {
   /** Values */
 
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: Route.fullPath });
-  const isSm = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const navigate = Route.useNavigate();
   const selectedProjectId = search.project;
 
   /** Queries */
@@ -70,8 +69,7 @@ function RouteComponent() {
   ];
 
   return (
-    <Container disableGutters={isSm}>
-      <PageHeader title="Art" sx={{ px: isSm ? 1 : 0 }} />
+    <Container disableGutters>
       <ProjectGrid
         projects={projects}
         hasMore={projectListQuery.hasNextPage}
@@ -79,7 +77,6 @@ function RouteComponent() {
         error={projectListQuery.error}
         onLoadMore={projectListQuery.fetchNextPage}
         onRefetch={projectListQuery.refetch}
-        sx={{ my: 2 }}
         slotProps={{
           card: (project) => ({ onClick: () => handleProjectOnClick(project) }),
         }}

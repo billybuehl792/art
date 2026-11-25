@@ -1,7 +1,7 @@
 import React, { type ComponentType } from "react";
 import { IconButton, type IconButtonProps } from "@mui/material";
 
-interface SocialIconButtonProps extends IconButtonProps<"a"> {
+export interface SocialIconButtonProps extends IconButtonProps<"a"> {
   Icon: ComponentType;
 }
 

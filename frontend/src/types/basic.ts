@@ -5,6 +5,7 @@ import type {
   listRequestParamsSchema,
   listResponseSchema,
 } from "@/schemas/basic";
+import type { LinkProps } from "@mui/material";
 
 /** Basic */
 
@@ -25,6 +26,11 @@ export interface MenuOption {
   color?: MenuItemColor;
   Icon: SvgIconComponent;
   onClick: VoidFunction;
+}
+
+export interface Breadcrumb extends LinkProps {
+  label: string;
+  Icon?: SvgIconComponent;
 }
 
 export type Id = z.infer<typeof idSchema>;

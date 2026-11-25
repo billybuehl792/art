@@ -12,7 +12,6 @@ import DialogHeader from "../layout/DialogHeader";
 import StatusCard from "../cards/StatusCard";
 import MenuOptionsIconButton from "../buttons/MenuOptionsIconButton";
 import { projectQueries } from "@/queries/projects";
-import { NULL_ID } from "@/constants";
 import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
 
@@ -60,7 +59,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
   const open = openProp && !closing;
 
   const isId = typeof projectProp === "number";
-  const projectId = isId ? projectProp : (projectProp?.id ?? NULL_ID);
+  const projectId = isId ? projectProp : (projectProp?.id ?? 0);
 
   /** Queries */
 

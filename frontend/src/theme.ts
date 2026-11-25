@@ -125,12 +125,13 @@ export const createAppTheme = createTheme({
     MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
     MuiToolbar: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          minHeight: theme.layout.appBarHeight,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+        root: ({ theme: { palette, layout } }) => ({
+          minHeight: layout.appBarHeight,
+          borderBottom: `1px solid ${palette.divider}`,
           [`@media (min-width: 0px) and (orientation: landscape)`]: {
-            minHeight: theme.layout.appBarHeight,
+            minHeight: layout.appBarHeight,
           },
+          [`@media (min-width: 600px)`]: { minHeight: layout.appBarHeight },
         }),
       },
     },
