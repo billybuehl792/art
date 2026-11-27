@@ -1,24 +1,26 @@
 import type React from "react";
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import { Button, Typography, Stack } from "@mui/material";
+import { Button, Container } from "@mui/material";
+import StatusCard from "../cards/StatusCard";
 
 const ErrorScreen: React.FC<ErrorComponentProps> = ({ error, reset }) => {
   /** Values */
 
-  const errorMessage = error instanceof Error ? error.message : null;
+  const errorMessage = error instanceof Error ? error.message : undefined;
 
   return (
-    <Stack spacing={2} sx={{ alignItems: "center" }}>
-      <Typography variant="h5">Something went wrong</Typography>
-
-      {errorMessage && (
-        <Typography color="text.secondary">{errorMessage}</Typography>
-      )}
-
-      <Button variant="contained" onClick={reset}>
-        Try again
-      </Button>
-    </Stack>
+    <Container variant="centered">
+      <StatusCard
+        status="error"
+        title="Something went wrong."
+        message={errorMessage}
+        action={
+          <Button variant="contained" aria-label="retry" onClick={reset}>
+            Retry
+          </Button>
+        }
+      />
+    </Container>
   );
 };
 

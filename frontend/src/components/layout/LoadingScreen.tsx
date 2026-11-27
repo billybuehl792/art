@@ -1,20 +1,17 @@
 import React from "react";
 import { Container, type ContainerProps } from "@mui/material";
 import StatusCard, { type StatusCardProps } from "../cards/StatusCard";
-import { sxArray } from "@/utils/sx";
 
 interface LoadingScreenProps extends ContainerProps {
-  fullScreen?: boolean;
   slotProps?: { card?: Partial<StatusCardProps> };
 }
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({
-  fullScreen,
   slotProps,
   ...props
 }) => {
   return (
-    <Container {...props} sx={sxArray({ my: 2 }, props?.sx)}>
+    <Container variant="centered" {...props}>
       <StatusCard status="loading" {...slotProps?.card} />
     </Container>
   );

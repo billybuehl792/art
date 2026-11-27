@@ -3,6 +3,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Divider,
   Stack,
   Typography,
   type CardProps,
@@ -51,22 +52,18 @@ const StatusCard: React.FC<StatusCardProps> = ({
   return (
     <Card {...props}>
       <CardContent>
-        <Stack
-          spacing={1}
-          sx={{
-            py: 6,
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {content.icon}
-          <Typography variant="h3">{content.title}</Typography>
-          {content.message && (
-            <Typography variant="subtitle2" color="text.secondary">
-              {content.message}
+        <Stack spacing={2} divider={<Divider />} sx={{ px: 6, py: 4 }}>
+          <Stack spacing={1} sx={{ alignItems: "center" }}>
+            {content.icon}
+            <Typography variant="h3" sx={{ textAlign: "center" }}>
+              {content.title}
             </Typography>
-          )}
+            {!!content.message && (
+              <Typography variant="subtitle2" color="text.secondary">
+                {content.message}
+              </Typography>
+            )}
+          </Stack>
           {action}
         </Stack>
       </CardContent>

@@ -99,7 +99,7 @@ const ContactCardLink: React.FC<LinkProps> = ({ children, ...props }) => {
       )}
     >
       {children}
-      <OpenInNewIcon />
+      <OpenInNewIcon fontSize="inherit" />
     </Link>
   );
 };
