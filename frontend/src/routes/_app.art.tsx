@@ -72,7 +72,7 @@ function RouteComponent() {
   ];
 
   return (
-    <Container disableGutters>
+    <Container disableGutters maxWidth="xl">
       <ProjectGrid
         projects={projects}
         hasMore={projectListQuery.hasNextPage}

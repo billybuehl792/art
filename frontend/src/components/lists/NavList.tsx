@@ -13,6 +13,7 @@ import {
   Brush as BrushIcon,
   Code as CodeIcon,
   ContactPage as ContactPageIcon,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
 
@@ -38,7 +39,7 @@ const NavList: React.FC<NavListProps> = ({
 
   return (
     <Stack divider={<Divider />} {...props}>
-      <List {...slotProps?.list}>
+      <List disablePadding {...slotProps?.list}>
         <ListItemButtonLink to="/" {...buttonProps}>
           <ListItemIcon children={<HomeIcon />} />
           <ListItemText primary="home" />
@@ -57,6 +58,13 @@ const NavList: React.FC<NavListProps> = ({
         <ListItemButtonLink to="/contact" {...buttonProps}>
           <ListItemIcon children={<ContactPageIcon />} />
           <ListItemText primary="contact" />
+        </ListItemButtonLink>
+
+        <Divider />
+
+        <ListItemButtonLink to="/settings" {...buttonProps}>
+          <ListItemIcon children={<SettingsIcon />} />
+          <ListItemText primary="settings" />
         </ListItemButtonLink>
       </List>
     </Stack>

@@ -1,13 +1,7 @@
 import React, { type ReactNode } from "react";
 import { styled } from "@mui/material/styles";
-import {
-  IconButton,
-  Skeleton,
-  Stack,
-  Typography,
-  type StackProps,
-} from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
+import { Skeleton, Stack, Typography, type StackProps } from "@mui/material";
+import CloseIconButton from "../buttons/CloseIconButton";
 import { truncateText } from "@/utils/sx";
 
 export interface DialogHeaderProps extends Omit<StackProps, "title"> {
@@ -57,9 +51,7 @@ const DialogHeader: React.FC<DialogHeaderProps> = ({
       )}
       <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
         {endContent}
-        <IconButton aria-label="close" onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
+        <CloseIconButton onClick={onClose} />
       </Stack>
     </StyledStack>
   );

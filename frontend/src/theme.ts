@@ -1,9 +1,16 @@
 import "@mui/material/styles";
+import "@mui/material/Container";
 import { createTheme } from "@mui/material/styles";
 import { hexToRgba, toRgbaString } from "./utils/color";
 
 const DEFAULT_WHITE = "#f0f0f0";
 const DEFAULT_BLACK = "#141414";
+
+declare module "@mui/material/Container" {
+  interface ContainerOwnProps {
+    variant?: "default" | "centered";
+  }
+}
 
 declare module "@mui/material/styles" {
   interface Theme {
@@ -28,6 +35,7 @@ export const createAppTheme = createTheme({
   colorSchemes: {
     light: {
       palette: {
+        common: { white: DEFAULT_WHITE, black: DEFAULT_BLACK },
         primary: {
           main: DEFAULT_BLACK,
           dark: "#000",
@@ -39,6 +47,7 @@ export const createAppTheme = createTheme({
     },
     dark: {
       palette: {
+        common: { white: DEFAULT_WHITE, black: DEFAULT_BLACK },
         primary: {
           main: DEFAULT_WHITE,
           dark: "#FFF",
@@ -76,8 +85,36 @@ export const createAppTheme = createTheme({
       defaultProps: { disableElevation: true },
     },
     MuiCard: { defaultProps: { variant: "outlined" } },
+    MuiCardContent: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          "&:last-child": { paddingBottom: theme.spacing(2) },
+        }),
+      },
+    },
     MuiCardHeader: {
       styleOverrides: { title: ({ theme }) => ({ ...theme.typography.h3 }) },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          variants: [
+            {
+              props: { variant: "centered" },
+              style: ({ theme: { breakpoints, layout } }) => ({
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: `calc(100vh - ${layout.footerHeight}px - ${layout.appBarHeight}px)`,
+                [breakpoints.up("sm")]: {
+                  minHeight: `calc(100vh - ${layout.footerHeight}px)`,
+                },
+              }),
+            },
+          ],
+        },
+      },
     },
     MuiDialogContent: {
       styleOverrides: {
@@ -87,9 +124,9 @@ export const createAppTheme = createTheme({
       },
     },
     MuiLink: {
+      defaultProps: { underline: "none" },
       styleOverrides: {
         root: ({ theme }) => ({
-          transition: "color 0.2s ease",
           ":hover": {
             color: toRgbaString(hexToRgba(theme.palette.text.primary, 0.4)),
           },
@@ -98,7 +135,6 @@ export const createAppTheme = createTheme({
           },
         }),
       },
-      defaultProps: { underline: "none" },
     },
     MuiListItemButton: {
       styleOverrides: {

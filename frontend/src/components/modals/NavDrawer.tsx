@@ -1,17 +1,15 @@
 import React from "react";
+import { styled } from "@mui/material/styles";
 import {
-  Divider,
   Drawer,
   type DrawerProps,
-  IconButton,
   Stack,
-  styled,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Close as CloseIcon } from "@mui/icons-material";
 import NavList from "../lists/NavList";
 import SocialList from "../lists/SocialList";
+import CloseIconButton from "../buttons/CloseIconButton";
 import { APP_TITLE } from "../../constants";
 import { truncateText } from "../../utils/sx";
 
@@ -30,19 +28,11 @@ const NavDrawer: React.FC<DrawerProps> = ({ onClose, ...props }) => {
         <Typography variant="h2" sx={truncateText}>
           {APP_TITLE}
         </Typography>
-        <IconButton color="primary" onClick={handleOnClose}>
-          <CloseIcon />
-        </IconButton>
+        <CloseIconButton onClick={handleOnClose} />
       </Toolbar>
 
-      <Divider />
-
       <Stack sx={{ flexGrow: 1, overflow: "auto" }}>
-        <NavList
-          onNavigate={handleOnClose}
-          slotProps={{ list: { disablePadding: true } }}
-          sx={{ flexGrow: 1 }}
-        />
+        <NavList onNavigate={handleOnClose} sx={{ flexGrow: 1 }} />
         <Stack
           sx={(theme) => ({
             position: "sticky",

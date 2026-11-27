@@ -9,18 +9,7 @@ export const Route = createFileRoute("/_app/contact")({
 
 function RouteComponent() {
   return (
-    <Container
-      sx={({ layout }) => ({
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: {
-          xs: `calc(100vh - ${layout.footerHeight}px - ${layout.appBarHeight}px)`,
-          sm: `calc(100vh - ${layout.footerHeight}px)`,
-        },
-      })}
-    >
+    <Container variant="centered">
       <ContactCard sx={{ my: 2 }} />
     </Container>
   );

@@ -97,11 +97,17 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
         sx={{
           flex: 1,
           minHeight: 0,
-          overflowY: "auto",
           padding: 0,
+          overflowY: "auto",
         }}
       >
-        <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+        <Stack
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: 400,
+          }}
+        >
           {projectQuery.isLoading ? (
             <Skeleton
               variant="rectangular"

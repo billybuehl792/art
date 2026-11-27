@@ -5,11 +5,9 @@ import ListItemButton, {
 } from "@mui/material/ListItemButton";
 
 const ListItemButtonLink = createLink(
-  forwardRef<HTMLAnchorElement, ListItemButtonProps<"a">>(
-    function ListItemButtonLink(props, ref) {
-      return <ListItemButton ref={ref} component="a" {...props} />;
-    },
-  ),
+  forwardRef<HTMLAnchorElement, ListItemButtonProps<"a">>((props, ref) => (
+    <ListItemButton ref={ref} component="a" {...props} />
+  )),
 );
 
 export default ListItemButtonLink;
