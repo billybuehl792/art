@@ -9,12 +9,7 @@ import SocialIconButton, {
   type SocialIconButtonProps,
 } from "../buttons/SocialIconButton";
 import ArtStationIcon from "../icons/ArtStationIcon";
-import {
-  ARTSTATION_URL,
-  GITHUB_URL,
-  INSTAGRAM_URL,
-  LINKEDIN_URL,
-} from "../../constants";
+import { SOCIAL_URLS as SOCIAL } from "../../constants";
 
 interface SocialListProps extends StackProps {
   slotProps?: { iconButton?: Partial<SocialIconButtonProps> };
@@ -24,10 +19,10 @@ const SocialList: React.FC<SocialListProps> = ({ slotProps, ...props }) => {
   /** Values */
 
   const items = [
-    { label: "GitHub Profile", href: GITHUB_URL, Icon: GitHubIcon },
-    { label: "Instagram Profile", href: INSTAGRAM_URL, Icon: InstagramIcon },
-    { label: "LinkedIn Profile", href: LINKEDIN_URL, Icon: LinkedInIcon },
-    { label: "ArtStation Profile", href: ARTSTATION_URL, Icon: ArtStationIcon },
+    { label: "GitHub", href: SOCIAL.GITHUB, Icon: GitHubIcon },
+    { label: "Instagram", href: SOCIAL.INSTAGRAM, Icon: InstagramIcon },
+    { label: "LinkedIn", href: SOCIAL.LINKEDIN, Icon: LinkedInIcon },
+    { label: "ArtStation", href: SOCIAL.ARTSTATION, Icon: ArtStationIcon },
   ];
 
   return (

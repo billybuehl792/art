@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import {
+  Box,
   IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
+  Tooltip,
   type IconButtonProps,
 } from "@mui/material";
 import { MoreVert as MoreVertIcon } from "@mui/icons-material";
@@ -33,13 +35,18 @@ const MenuOptionsIconButton: React.FC<MenuOptionsIconButtonProps> = ({
 
   return (
     <>
-      <IconButton
-        disabled={disabled || !filteredOptions.length}
-        {...props}
-        onClick={handleOnClick}
-      >
-        <MoreVertIcon />
-      </IconButton>
+      <Tooltip title="Options">
+        <Box component="span">
+          <IconButton
+            disabled={disabled || !filteredOptions.length}
+            {...props}
+            onClick={handleOnClick}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        </Box>
+      </Tooltip>
+
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleOnClose}>
         {filteredOptions.map(
           ({ id, title, subtitle, color, Icon, onClick }) => (

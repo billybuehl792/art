@@ -6,7 +6,7 @@ const CloseIconButton: React.FC<IconButtonProps> = (props) => {
   return (
     <Tooltip title="Close">
       <Box component="span">
-        <IconButton aria-label="close" {...props}>
+        <IconButton aria-label="close" color="primary" {...props}>
           <CloseIcon />
         </IconButton>
       </Box>

@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Container } from "@mui/material";
-import { Download as DownloadIcon } from "@mui/icons-material";
+import {
+  Download as DownloadIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
 import ProjectDialog from "@/components/modals/ProjectDialog";
 import ProjectGrid from "@/components/lists/ProjectGrid";
 import { idSchema } from "@/schemas/basic";
@@ -18,7 +21,7 @@ const validateSearch = z.object({ project: idSchema.optional() });
 export const Route = createFileRoute("/_app/art")({
   component: RouteComponent,
   validateSearch,
-  staticData: { breadcrumb: { label: "art" } },
+  staticData: { breadcrumb: { label: category } },
 });
 
 function RouteComponent() {
@@ -59,7 +62,19 @@ function RouteComponent() {
       resetScroll: false,
     });
 
+  const handleProjectNavigate = (project: Project) =>
+    navigate({
+      to: "/projects/$id",
+      params: { id: String(project.id) },
+    });
+
   const getProjectOptions = (project: Project): MenuOption[] => [
+    {
+      id: "view",
+      title: "View",
+      Icon: InfoIcon,
+      onClick: () => handleProjectNavigate(project),
+    },
     {
       id: "download",
       render: !!project.mediaUrl,

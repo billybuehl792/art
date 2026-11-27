@@ -54,6 +54,7 @@ const ProjectListItem: React.FC<ProjectListItemProps> = ({
 
   return (
     <ListItem
+      disablePadding
       {...props}
       sx={sxArray(
         {
@@ -86,11 +87,7 @@ const ProjectListItem: React.FC<ProjectListItemProps> = ({
             justifyContent: "center",
           }}
         >
-          <MenuOptionsIconButton
-            options={options}
-            size="small"
-            disabled={disabled}
-          />
+          <MenuOptionsIconButton options={options} disabled={disabled} />
         </Stack>
       )}
     </ListItem>

@@ -14,6 +14,8 @@ import { ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./theme";
+import LoadingScreen from "./components/layout/LoadingScreen";
+import ErrorScreen from "./components/layout/ErrorScreen";
 import type { Breadcrumb } from "./types/basic";
 
 declare module "@tanstack/react-router" {
@@ -25,9 +27,17 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const router = createRouter({ routeTree });
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+});
+
+const router = createRouter({
+  routeTree,
+  context: { queryClient },
+  defaultPendingMs: 0,
+  defaultPendingMinMs: 300,
+  defaultPendingComponent: LoadingScreen,
+  defaultErrorComponent: ErrorScreen,
 });
 
 const rootElement = document.getElementById("root")!;

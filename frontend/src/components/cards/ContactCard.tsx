@@ -16,7 +16,7 @@ import {
 } from "@mui/icons-material";
 import SocialList from "../lists/SocialList";
 import { sxArray, truncateText } from "@/utils/sx";
-import { DESIGN_RESUME, DEV_RESUME, EMAIL } from "@/constants";
+import { RESUME, EMAIL } from "@/constants";
 
 const ContactCard: React.FC<CardProps> = (props) => {
   /** Values */
@@ -32,8 +32,8 @@ const ContactCard: React.FC<CardProps> = (props) => {
       Icon: Article,
       value: (
         <Stack sx={{ alignItems: "flex-start" }}>
-          <ContactCardLink children="Dev Resume" href={DEV_RESUME} />
-          <ContactCardLink children="Design Resume" href={DESIGN_RESUME} />
+          <ContactCardLink children="Dev Resume" href={RESUME.DEV} />
+          <ContactCardLink children="Design Resume" href={RESUME.DESIGN} />
         </Stack>
       ),
     },
@@ -99,7 +99,7 @@ const ContactCardLink: React.FC<LinkProps> = ({ children, ...props }) => {
       )}
     >
       {children}
-      <OpenInNewIcon fontSize="inherit" />
+      <OpenInNewIcon />
     </Link>
   );
 };

@@ -84,6 +84,17 @@ export const createAppTheme = createTheme({
       styleOverrides: { root: { textTransform: "none" } },
       defaultProps: { disableElevation: true },
     },
+    MuiBreadcrumbs: {
+      styleOverrides: {
+        root: {
+          flexGrow: 1,
+          flexWrap: "nowrap",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
+        },
+      },
+    },
     MuiCard: { defaultProps: { variant: "outlined" } },
     MuiCardContent: {
       styleOverrides: {
@@ -148,6 +159,11 @@ export const createAppTheme = createTheme({
             "& .MuiListItemIcon-root": { color: theme.palette.primary.main },
           },
         }),
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: { "& .MuiSvgIcon-root": { fontSize: "inherit" } },
       },
     },
     MuiImageList: { styleOverrides: { root: () => ({ margin: 0 }) } },

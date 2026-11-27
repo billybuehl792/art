@@ -48,7 +48,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
       <ProjectListItem
         key={project.id}
         project={project}
-        disabled={loading || disabled}
+        disabled={disabled}
         {...(!!options?.sortable && { sortIndex: index })}
         {...slotProps?.card?.(project)}
       />

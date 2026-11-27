@@ -8,14 +8,8 @@ import {
   type ListProps,
   type StackProps,
 } from "@mui/material";
-import {
-  Home as HomeIcon,
-  Brush as BrushIcon,
-  Code as CodeIcon,
-  ContactPage as ContactPageIcon,
-  Settings as SettingsIcon,
-} from "@mui/icons-material";
 import ListItemButtonLink from "../links/ListItemButtonLink";
+import { ICONS } from "@/constants";
 
 interface NavListProps extends StackProps {
   onNavigate?: VoidFunction;
@@ -41,29 +35,29 @@ const NavList: React.FC<NavListProps> = ({
     <Stack divider={<Divider />} {...props}>
       <List disablePadding {...slotProps?.list}>
         <ListItemButtonLink to="/" {...buttonProps}>
-          <ListItemIcon children={<HomeIcon />} />
+          <ListItemIcon children={<ICONS.HOME />} />
           <ListItemText primary="home" />
         </ListItemButtonLink>
 
         <ListItemButtonLink to="/art" {...buttonProps}>
-          <ListItemIcon children={<BrushIcon />} />
+          <ListItemIcon children={<ICONS.ART />} />
           <ListItemText primary="art" />
         </ListItemButtonLink>
 
         <ListItemButtonLink to="/dev" {...buttonProps}>
-          <ListItemIcon children={<CodeIcon />} />
+          <ListItemIcon children={<ICONS.DEV />} />
           <ListItemText primary="dev" />
         </ListItemButtonLink>
 
         <ListItemButtonLink to="/contact" {...buttonProps}>
-          <ListItemIcon children={<ContactPageIcon />} />
+          <ListItemIcon children={<ICONS.CONTACT />} />
           <ListItemText primary="contact" />
         </ListItemButtonLink>
 
         <Divider />
 
         <ListItemButtonLink to="/settings" {...buttonProps}>
-          <ListItemIcon children={<SettingsIcon />} />
+          <ListItemIcon children={<ICONS.SETTINGS />} />
           <ListItemText primary="settings" />
         </ListItemButtonLink>
       </List>
