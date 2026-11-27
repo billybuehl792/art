@@ -64,7 +64,11 @@ const StatusCard: React.FC<StatusCardProps> = ({
               </Typography>
             )}
           </Stack>
-          {action}
+          {!!action && (
+            <Stack sx={{ justifyContent: "center", alignItems: "center" }}>
+              {action}
+            </Stack>
+          )}
         </Stack>
       </CardContent>
     </Card>

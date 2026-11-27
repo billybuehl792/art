@@ -16,6 +16,7 @@ import { routeTree } from "./routeTree.gen";
 import { createAppTheme } from "./theme";
 import LoadingScreen from "./components/layout/LoadingScreen";
 import ErrorScreen from "./components/layout/ErrorScreen";
+import NotFoundScreen from "./components/layout/NotFoundScreen";
 import type { Breadcrumb } from "./types/basic";
 
 declare module "@tanstack/react-router" {
@@ -38,6 +39,7 @@ const router = createRouter({
   defaultPendingMinMs: 300,
   defaultPendingComponent: LoadingScreen,
   defaultErrorComponent: ErrorScreen,
+  defaultNotFoundComponent: NotFoundScreen,
 });
 
 const rootElement = document.getElementById("root")!;

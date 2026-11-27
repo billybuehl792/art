@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, stripSearchParams } from "@tanstack/react-router";
 import { z } from "zod";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Container } from "@mui/material";
@@ -16,11 +16,17 @@ import type { Project } from "@/types/projects";
 import type { MenuOption } from "@/types/basic";
 
 const category: Project["category"] = "art";
-const validateSearch = z.object({ project: idSchema.optional() });
+const validateSearch = z.object({
+  project: z.preprocess((value) => {
+    const res = idSchema.safeParse(value);
+    return res.success ? res.data : undefined;
+  }, idSchema.optional()),
+});
 
 export const Route = createFileRoute("/_app/art")({
   component: RouteComponent,
   validateSearch,
+  search: { middlewares: [stripSearchParams(validateSearch.parse({}))] },
   staticData: { breadcrumb: { label: category } },
 });
 
@@ -54,12 +60,14 @@ function RouteComponent() {
     navigate({
       search: (prev) => ({ ...prev, project: String(project.id) }),
       resetScroll: false,
+      replace: true,
     });
 
   const handleProjectOnClose = () =>
     navigate({
       search: ({ project: _, ...prev }) => prev,
       resetScroll: false,
+      replace: true,
     });
 
   const handleProjectNavigate = (project: Project) =>

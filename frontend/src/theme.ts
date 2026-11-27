@@ -79,7 +79,6 @@ export const createAppTheme = createTheme({
   shape: { borderRadius: 8 },
   zIndex: { appBar: 1100, drawer: 1200 },
   components: {
-    MuiAppBar: { defaultProps: { elevation: 0 } },
     MuiButton: {
       styleOverrides: { root: { textTransform: "none" } },
       defaultProps: { disableElevation: true },
@@ -175,17 +174,5 @@ export const createAppTheme = createTheme({
       },
     },
     MuiPaper: { styleOverrides: { root: { backgroundImage: "none" } } },
-    MuiToolbar: {
-      styleOverrides: {
-        root: ({ theme: { palette, layout } }) => ({
-          minHeight: layout.appBarHeight,
-          borderBottom: `1px solid ${palette.divider}`,
-          [`@media (min-width: 0px) and (orientation: landscape)`]: {
-            minHeight: layout.appBarHeight,
-          },
-          [`@media (min-width: 600px)`]: { minHeight: layout.appBarHeight },
-        }),
-      },
-    },
   },
 });
